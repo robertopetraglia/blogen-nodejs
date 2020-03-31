@@ -3,6 +3,7 @@ require('./db/mongoose')
 const path = require('path')
 const hbs = require('hbs')
 const userRouter = require('./routers/user')
+const auth = require('./middleware/auth')
 
 const app = express()
 const port = process.env.PORT
@@ -23,7 +24,7 @@ app.use(express.static(publicDirPath))
 app.use(express.json())
 app.use(userRouter)
 
-app.get('/', (req, res) => {
+app.get('/', auth, (req, res) => {
     res.render('index', {
         pageTitle: 'Blogen | Home'
     })
