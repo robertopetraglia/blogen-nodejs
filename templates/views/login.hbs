@@ -45,13 +45,13 @@
                             <form id="login-form" method="POST" action="/user/auth" data-parsley-validate="">
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" class="form-control"
+                                    <input type="email" name="email" class="form-control"
                                         data-parsley-required="true"
                                         data-parsley-type="email">
                                 </div>
                                 <div class="form-group">
                                     <label for="password">Password</label>
-                                    <input type="password" class="form-control"
+                                    <input type="password" name="password" class="form-control"
                                         data-parsley-required="true">
                                 </div>
                                 <input type="submit" class="btn btn-primary btn-block" />
@@ -100,10 +100,6 @@
             $('#login-form').on('form:validate', function(form) {
                 return form.isValid()
             });
-
-            {{#if errors}}
-                $('#error-message').fadeOut(5000);
-            {{/if}}
         })
     </script>
 </body>

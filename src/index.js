@@ -1,6 +1,7 @@
 const express = require('express')
 const flash = require('connect-flash')
 const session = require('express-session')
+const bodyParser = require('body-parser')
 //require('./db/mongoose')
 const path = require('path')
 const hbs = require('hbs')
@@ -22,7 +23,7 @@ hbs.registerPartials(partialsPath)
 
 // Setup static directory to serve
 app.use(express.static(publicDirPath))
-
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.json())
 
 app.use(session({
