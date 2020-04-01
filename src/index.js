@@ -1,12 +1,14 @@
 const express = require('express')
-require('./db/mongoose')
+const flash = require('connect-flash')
+const session = require('express-session')
+//require('./db/mongoose')
 const path = require('path')
 const hbs = require('hbs')
 const userRouter = require('./routers/user')
 const auth = require('./middleware/auth')
 
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 3000
 
 // Define paths for Express config
 const publicDirPath = path.join(__dirname, '../public')
@@ -22,12 +24,23 @@ hbs.registerPartials(partialsPath)
 app.use(express.static(publicDirPath))
 
 app.use(express.json())
+
+app.use(session({
+    secret: 'keyboard cat',
+    resave: false,
+    saveUninitialized: true
+  }))
+app.use(flash());
+app.use(function(req, res, next){
+    res.locals.success = req.flash('success');
+    res.locals.errors = req.flash('error');
+    next();
+});
+
 app.use(userRouter)
 
-app.get('/', auth, (req, res) => {
-    res.render('index', {
-        pageTitle: 'Blogen | Home'
-    })
+app.get('/', (req, res) => {
+    res.redirect(301, '/login')
 })
 
 app.get('*', (req, res) => {
@@ -36,6 +49,11 @@ app.get('*', (req, res) => {
         errorMessage: 'Page not found'
     })
 })
+
+app.use(function(error, req, res, next) {
+    res.status(401).render('login', { errorMessage: error.message });
+  });
+  
 
 app.listen(port, () => {
     console.log('Server up and running on port ' + port)
