@@ -1,0 +1,10 @@
+html,
+body {
+    max-height: 100vh;
+}
+
+.main-container {
+    overflow: auto;
+    max-height: calc(100vh - 142px);
+}
+

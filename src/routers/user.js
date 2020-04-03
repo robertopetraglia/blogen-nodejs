@@ -15,9 +15,8 @@ router.post('/user/create', async (req, res) => {
         await user.save()
         
         const token = await user.generateAuthToken()
-        console.log({ user, token })
         
-        res.redirect('/user/dashboard')
+        res.redirect('/user/dashboard/?token=' + token)
     } catch (e) {
         req.flash('error', e.message)
         res.redirect('/login')
@@ -27,9 +26,8 @@ router.post('/user/create', async (req, res) => {
 router.post('/user/auth', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
-        const token = user.generateAuthToken()
-        console.log({user, token})
-        res.redirect('/user/dashboard')
+        const token = await user.generateAuthToken()
+        res.redirect('/user/dashboard/?token=' + token)
     } catch (e) {
         req.flash('error', e.message)
         res.redirect('/login')
