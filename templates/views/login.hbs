@@ -26,7 +26,7 @@
         <div class="container">
             <div class="row">
                 {{#if errors}}
-                    <div class="col-md-6 ml-auto mr-auto" id="error-message">
+                    <div class="col-md" id="error-message">
                         <div class="alert alert-danger alert-dismissible fade show">
                             {{errors}}
                             <button type="button" class="close" data-dismiss="alert">
@@ -36,13 +36,13 @@
                     </div>
                     <div class="w-100"></div>
                 {{/if}}
-                <div class="col-md-6 ml-auto mr-auto">
+                <div class="col-md-6">
                     <div class="card">
                         <div class="card-header">
                             <h4>Account Login</h4>
                         </div>
                         <div class="card-body">
-                            <form id="login-form" method="POST" action="/user/auth" data-parsley-validate="">
+                            <form id="login-form" class="user-form" method="POST" action="/user/auth" data-parsley-validate="">
                                 <div class="form-group">
                                     <label for="email">Email</label>
                                     <input type="email" name="email" class="form-control"
@@ -55,6 +55,41 @@
                                         data-parsley-required="true">
                                 </div>
                                 <input type="submit" class="btn btn-primary btn-block" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3 mt-sm-3 mt-md-0 mt-lg-0">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Register an account</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="login-form" class="user-form" method="POST" action="/user/create" data-parsley-validate="">
+                                 <div class="form-group">
+                                    <label for="name">Name</label>
+                                    <input type="name" name="name" class="form-control"
+                                        data-parsley-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" class="form-control"
+                                        data-parsley-required="true"
+                                        data-parsley-type="email">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Password</label>
+                                    <input type="password" id="password" name="password" class="form-control"
+                                        data-parsley-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password">Confirm Password</label>
+                                    <input type="password" name="confirm-password" class="form-control"
+                                        data-parsley-required="true"
+                                        data-parsley-equalto="#password"
+                                        data-parsley-error-message="Password and confirm password are not equal">
+                                </div>
+                                <input type="submit" class="btn btn-success btn-block" />
                             </form>
                         </div>
                     </div>
@@ -76,7 +111,7 @@
         $('#year').text(new Date().getFullYear());
 
         $(function() {
-            $('#login-form').parsley({
+            $('.user-form').parsley({
                 successClass: "has-success",
                 errorClass: "has-danger",
                 classHandler: function (el) {
@@ -97,7 +132,7 @@
                 this.$element.next().remove()
             });
             
-            $('#login-form').on('form:validate', function(form) {
+            $('.user-form').on('form:validate', function(form) {
                 return form.isValid()
             });
         })

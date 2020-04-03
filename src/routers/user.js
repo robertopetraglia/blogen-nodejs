@@ -9,11 +9,26 @@ router.get('/login', (req, res) => {
     })
 })
 
-router.post('/user/auth', async (req, res) => {
+router.post('/user/create', async (req, res) => {
     try {
         const user = new User(req.body)
         await user.save()
-        await user.generateAuthToken()    
+        
+        const token = await user.generateAuthToken()
+        console.log({ user, token })
+        
+        res.redirect('/user/dashboard')
+    } catch (e) {
+        req.flash('error', e.message)
+        res.redirect('/login')
+    }
+})
+
+router.post('/user/auth', async (req, res) => {
+    try {
+        const user = await User.findByCredentials(req.body.email, req.body.password)
+        const token = user.generateAuthToken()
+        console.log({user, token})
         res.redirect('/user/dashboard')
     } catch (e) {
         req.flash('error', e.message)
