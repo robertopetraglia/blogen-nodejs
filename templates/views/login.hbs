@@ -113,42 +113,7 @@
 
     {{>footer}}
 
-    <script src="http://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="https://cdn.ckeditor.com/4.9.2/standard/ckeditor.js"></script>
-    <script type="text/javascript" src="js/parsley.min.js"></script>
+    {{>scripts}}
 
-    <script>
-        // Get the current year for the copyright
-        $('#year').text(new Date().getFullYear());
-
-        $(function() {
-            $('.user-form').parsley({
-                successClass: "has-success",
-                errorClass: "has-danger",
-                classHandler: function (el) {
-                    return el.$element.closest('.form-group');
-                },
-                errorsContainer: function (el) {
-                    return el.$element.closest('.form-group');
-                },
-                errorsWrapper: "<div class='alert alert-danger mt-2'></div>",
-                errorTemplate: "<span></span>",
-            });
-
-            window.Parsley.on('field:error', function() {
-                this.$element.addClass('form-control-danger')
-            });
-
-            window.Parsley.on('field:success', function() {
-                this.$element.next().remove()
-            });
-            
-            $('.user-form').on('form:validate', function(form) {
-                return form.isValid()
-            });
-        })
-    </script>
 </body>
 </html>

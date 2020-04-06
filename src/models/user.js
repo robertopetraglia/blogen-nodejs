@@ -44,6 +44,12 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 })
 
+userSchema.virtual('posts', {
+    ref: 'Post',
+    localField: '_id',
+    foreignField: 'owner'
+})
+
 userSchema.statics.findByCredentials = async (email, password) => {
     const user = await User.findOne({ email })
 
@@ -66,8 +72,18 @@ userSchema.methods.generateAuthToken = async function () {
 
     user.tokens = user.tokens.concat({ token })
     await user.save()
-    
     return token
+}
+
+userSchema.methods.getPosts = async function () {
+    const user = this
+    const posts = await user.find({ owner: user._id })
+    return posts
+}
+
+userSchema.methods.countPosts = async function() {
+    // const user = this
+    // const totPosts = await user.countDocuments({ _id})
 }
 
 userSchema.pre('save', async function(next) {

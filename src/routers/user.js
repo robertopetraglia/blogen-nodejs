@@ -34,15 +34,24 @@ router.post('/user/auth', async (req, res) => {
     }
 })
 
-router.get('/user/dashboard', auth, (req, res) => {
-    res.render('dashboard', {
-        name: req.user.name
-    })
+router.get('/user/dashboard', auth, async (req, res) => {
+    try {
+        await req.user.populate({
+            path: 'posts'
+        }).execPopulate()
+        console.log(req.user.posts)
+        res.render('dashboard', {
+            name: req.user.name,
+            pageTitle: 'Dashboard | Blogen',
+            posts: req.user.posts 
+        })
+    } catch (e) {
+        res.status(500).send()
+    }
 })
 
 router.get('/user/logout', auth, async (req, res) => {
     try {
-        console.log(req.token)
         req.user.tokens = req.user.tokens.filter((token) => {
             return token.token !== req.session.token
         })

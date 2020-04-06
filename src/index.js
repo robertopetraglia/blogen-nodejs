@@ -6,7 +6,7 @@ require('./db/mongoose')
 const path = require('path')
 const hbs = require('hbs')
 const userRouter = require('./routers/user')
-const auth = require('./middleware/auth')
+const postRouter = require('./routers/post')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -39,6 +39,7 @@ app.use(function(req, res, next){
 });
 
 app.use(userRouter)
+app.use(postRouter)
 
 app.get('/', (req, res) => {
     res.redirect(301, '/login')
