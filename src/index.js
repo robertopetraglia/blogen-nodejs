@@ -49,12 +49,7 @@ app.get('*', (req, res) => {
         title: '404 Page not found',
         errorMessage: 'Page not found'
     })
-})
-
-app.use(function(error, req, res, next) {
-    res.status(401).render('login', { errorMessage: error.message });
-  });
-  
+})  
 
 app.listen(port, () => {
     console.log('Server up and running on port ' + port)

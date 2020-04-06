@@ -35,7 +35,25 @@ router.post('/user/auth', async (req, res) => {
 })
 
 router.get('/user/dashboard', auth, (req, res) => {
-    res.render('dashboard')
+    res.render('dashboard', {
+        name: req.user.name
+    })
+})
+
+router.get('/user/logout', auth, async (req, res) => {
+    try {
+        console.log(req.token)
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.session.token
+        })
+        await req.user.save()
+
+        req.flash('success', 'Logout successfull')
+        res.redirect('/login');
+    } catch (e) {
+        req.flash('error', 'Please authenticate')
+        res.redirect('/login')
+    }
 })
 
 module.exports = router
