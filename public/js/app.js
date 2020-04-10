@@ -37,4 +37,10 @@ $(function() {
     $('form').on('form:validate', function(form) {
         return form.isValid()
     });
+
+    if (window.location.search.indexOf('pn') == 1) {
+        $('#previous-page-item').removeClass('disabled')
+    } else {
+        $('#previous-page-item').addClass('disabled')
+    }
 })

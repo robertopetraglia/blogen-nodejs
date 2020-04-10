@@ -10,3 +10,11 @@ hbs.registerHelper('dateFormat', function(date, format) {
 hbs.registerHelper('loopCounter', function(value) {
     return parseInt(value) + 1
 })
+
+hbs.registerHelper('gt', function(a, b) {
+    return (a > b);
+});
+
+hbs.registerHelper('eq', function(a, b) { 
+    return (a == b);
+});
