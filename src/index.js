@@ -5,8 +5,10 @@ const bodyParser = require('body-parser')
 require('./db/mongoose')
 const path = require('path')
 const hbs = require('hbs')
+require('./utils/handlebars')
 const userRouter = require('./routers/user')
 const postRouter = require('./routers/post')
+const categoryRouter = require('./routers/category')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -40,6 +42,7 @@ app.use(function(req, res, next){
 
 app.use(userRouter)
 app.use(postRouter)
+app.use(categoryRouter)
 
 app.get('/', (req, res) => {
     res.redirect(301, '/login')

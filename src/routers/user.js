@@ -1,5 +1,6 @@
 const express = require('express')
 const User = require('../models/user')
+const Category = require('../models/category')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
@@ -15,8 +16,9 @@ router.post('/user/create', async (req, res) => {
         await user.save()
         
         const token = await user.generateAuthToken()
-        
-        res.redirect('/user/dashboard/?token=' + token)
+        req.session.token = token
+
+        res.redirect('/user/dashboard')
     } catch (e) {
         req.flash('error', e.message)
         res.redirect('/login')
@@ -27,7 +29,8 @@ router.post('/user/auth', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.redirect('/user/dashboard/?token=' + token)
+        req.session.token = token
+        res.redirect('/user/dashboard')
     } catch (e) {
         req.flash('error', e.message)
         res.redirect('/login')
@@ -39,11 +42,18 @@ router.get('/user/dashboard', auth, async (req, res) => {
         await req.user.populate({
             path: 'posts'
         }).execPopulate()
-        console.log(req.user.posts)
+
+        const totUsers = await User.countUsers()
+        const totCategories = await Category.countCategories()
+        const allCategories = await Category.getAllCategories()
+
         res.render('dashboard', {
             name: req.user.name,
             pageTitle: 'Dashboard | Blogen',
-            posts: req.user.posts 
+            posts: req.user.posts,
+            totUsers,
+            totCategories,
+            allCategories
         })
     } catch (e) {
         res.status(500).send()
@@ -52,9 +62,10 @@ router.get('/user/dashboard', auth, async (req, res) => {
 
 router.get('/user/logout', auth, async (req, res) => {
     try {
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token !== req.session.token
-        })
+        // req.user.tokens = req.user.tokens.filter((token) => {
+        //     return token.token !== req.session.token
+        // })
+        req.user.tokens = []
         await req.user.save()
 
         req.flash('success', 'Logout successfull')

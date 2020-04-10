@@ -60,30 +60,17 @@
                                 <tbody>
                                     {{#each posts}}
                                         <tr>
-                                            <td>1</td>
+                                            <td>{{loopCounter @index}}</td>
                                             <td>{{title}}</td>
-                                            <td>{{category}}</td>
-                                            <td>{{createdAt}}</td>
+                                            <td>{{categoryFormat category}}</td>
+                                            <td>{{dateFormat createdAt "MMM D YYYY HH:mm"}}</td>
                                             <td>
-                                                <a href="details.html" class="btn btn-secondary">
+                                                <a href="/user/post/details?_id={{_id}}" class="btn btn-secondary">
                                                     <i class="fas fa-angle-double-right"></i> Details
                                                 </a>
                                             </td>
                                         </tr>
                                     {{/each}}
-                                    <!--
-                                    <tr>
-                                        <td>1</td>
-                                        <td>Post One</td>
-                                        <td>Web Development</td>
-                                        <td>May 10 2018</td>
-                                        <td>
-                                            <a href="details.html" class="btn btn-secondary">
-                                                <i class="fas fa-angle-double-right"></i> Details
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    -->
                                 </tbody>
                             </table>
                         </div>
@@ -95,25 +82,25 @@
                                 <h4 class="display-4">
                                     <i class="fas fa-pencil-alt"></i> {{posts.length}}
                                 </h4>
-                                <a href="posts.html" class="btn btn-outline-light btn-sm">View</a>
+                                <a href="/user/posts" class="btn btn-outline-light btn-sm">View</a>
                             </div>
                         </div>
                         <div class="card bg-success text-white text-center mb-3">
                             <div class="card-body">
                                 <h3>Categories</h3>
                                 <h4 class="display-4">
-                                    <i class="fas fa-folder"></i> 4
+                                    <i class="fas fa-folder"></i> {{totCategories}}
                                 </h4>
-                                <a href="categories.html" class="btn btn-outline-light btn-sm">View</a>
+                                <a href="/user/categories" class="btn btn-outline-light btn-sm">View</a>
                             </div>
                         </div>
                         <div class="card bg-warning text-white text-center mb-3">
                             <div class="card-body">
                                 <h3>Users</h3>
                                 <h4 class="display-4">
-                                    <i class="fas fa-users"></i> 4
+                                    <i class="fas fa-users"></i> {{totUsers}}
                                 </h4>
-                                <a href="users.html" class="btn btn-outline-light btn-sm">View</a>
+                                <a href="/user/list" class="btn btn-outline-light btn-sm">View</a>
                             </div>
                         </div>
                     </div>
@@ -145,11 +132,11 @@
                         </div>
                         <div class="form-group">
                             <label for="category">Category</label>
-                            <select name="category" class="form-control">
-                                <option value="0">Web Development</option>
-                                <option value="1">Tech Gadgets</option>
-                                <option value="2">Business</option>
-                                <option value="3">Health &amp; Wellness</option>
+                            <select name="category" class="form-control" data-parsley-required="true">
+                                <option value="">--- Select --- </option>
+                                {{#each allCategories}}
+                                    <option value="{{_id}}">{{title}}</option>
+                                {{/each}}
                             </select>
                         </div>
                         <!--
@@ -191,16 +178,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="add-category-form" class="user-form" method="POST" action="/user/category/save">
                         <div class="form-group">
                             <label for="title">Title</label>
-                            <input type="text" class="form-control" />
+                            <input type="text" name="title" class="form-control"
+                                data-parsley-required="true" />
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit"  class="btn btn-success" value="Save Changes" />
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-dismiss="modal">Save Changes</button>
-                </div>
+                </div>                
             </div>
         </div>
     </div>
@@ -216,27 +204,34 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="add-user-form" class="user-form" method="POST" action="/user/addnew/save">
                         <div class="form-group">
                             <label for="name">Name</label>
-                            <input type="text" class="form-control" />
+                            <input type="text" name="name" class="form-control"
+                                data-parsley-required="true" />
                         </div>
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" />
+                            <input type="email" name="email" class="form-control"
+                                data-parsley-required="true"
+                                data-parsley-type="email" />
                         </div>
                         <div class="form-group">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" />
+                            <input type="password" name="password" id="password" class="form-control"
+                                data-parsley-required="true" />
                         </div>
                         <div class="form-group">
                             <label for="conferma password">Confirm Password</label>
-                            <input type="password" class="form-control" />
+                            <input type="password" name="confirm-password" class="form-control"
+                                data-parsley-required="true"
+                                data-parsley-equalto="#password"
+                                data-parsley-error-message="Password and confirm password are not equal" />
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit"  class="btn btn-warning" value="Save Changes" />
                         </div>
                     </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-warning" data-dismiss="modal">Save Changes</button>
                 </div>
             </div>
         </div>
