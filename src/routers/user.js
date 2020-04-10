@@ -47,6 +47,11 @@ router.get('/user/dashboard', auth, async (req, res) => {
         const totCategories = await Category.countCategories()
         const allCategories = await Category.getAllCategories()
 
+        req.user.posts.map(post => {
+            let category = allCategories.find(category => category._id == post.category)
+            post.category = category.title
+        });
+
         res.render('dashboard', {
             name: req.user.name,
             pageTitle: 'Dashboard | Blogen',
@@ -57,6 +62,18 @@ router.get('/user/dashboard', auth, async (req, res) => {
         })
     } catch (e) {
         res.status(500).send()
+    }
+})
+
+router.post('/user/addnew/save', auth, async (req, res) => {
+    try {
+        const user = new User(req.body)
+        await user.save()
+
+        res.redirect('/user/dashboard')
+    } catch (e) {
+        req.flash('error', e.message)
+        res.redirect('/user/dashboard')
     }
 })
 

@@ -8,3 +8,7 @@ body {
     max-height: calc(100vh - 142px);
 }
 
+.form-control-danger {
+    border: 1px solid #f5c6cb;
+}
+

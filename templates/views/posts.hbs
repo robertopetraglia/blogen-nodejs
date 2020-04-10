@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>head}}
+
+<body>
+    {{>navbar}}
+
+    <!-- DASHBOARD -->
+    <header class="bg-primary text-white py-2">
+        <div class="container">
+            <h1><i class="fas fa-pencil-alt"></i> Posts <h1></h1>
+        </div>
+    </header>
+
+    <!-- SEARCH -->
+    <section id="search" class="py-4 mb-4 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ml-auto">
+                    <form id="search-post-form" class="user-form form-inline float-sm-right" action="/user/post/search">
+                        <div class="form-group">
+                            <input type="text" name="qs" id="qs" class="form-control mr-2" placeholder="Search Posts by title..." data-parsley-required="true">
+                        </div>
+                        <div class="btn-submit">
+                            <input type="submit" id="btn-search-post" class="btn btn-primary btn-search-post" value="Search" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>        
+    </section>
+
+    <!-- POSTS -->
+    <section id="posts">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Latest Posts</h4>
+                        </div>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Category</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each posts}}
+                                    <tr>
+                                        <td>{{loopCounter @index}}</td>
+                                        <td>{{title}}</td>
+                                        <td>{{category}}</td>
+                                        <td>{{dateFormat createdAt "MMM D YYYY HH:mm"}}</td>
+                                        <td>
+                                            <a href="/user/post/details?_id={{_id}}" class="btn btn-secondary">
+                                                <i class="fas fa-angle-double-right"></i> Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+                        <div class="container">
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#">Previous</a>
+                                </li>
+                                <li class="page-item active">
+                                    <a class="page-link" href="#">1</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">2</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">3</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">Next</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{>footer}}
+
+    {{>scripts}}
+
+    <script>
+        // Get the current year for the copyright
+        $('#year').text(new Date().getFullYear());
+    </script>
+</body>
+</html>

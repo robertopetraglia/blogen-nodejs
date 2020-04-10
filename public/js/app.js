@@ -2,12 +2,7 @@
 $('#year').text(new Date().getFullYear());
 
 $(function() {
-    let parsleyValiationOptions = {
-        successClass: "has-success",
-        errorClass: "has-danger",
-        classHandler: function (el) {
-            return el.$element.closest('.form-group');
-        },
+    var parsleyValiationOptions = {
         errorsContainer: function (el) {
             return el.$element.closest('.form-group');
         },
@@ -20,9 +15,23 @@ $(function() {
     });
 
     window.Parsley.on('field:success', function() {
-        this.$element.next().remove()
+        if ($('form#search-post-form').length) {
+            $('#btn-search-post').next().remove()
+        } else {
+            this.$element.next().remove()
+        }
     });
-    
+
+    if ($('form#search-post-form').length) {
+        parsleyValiationOptions = {
+            errorsContainer: function (el) {
+                return el.$element.parent().next();
+            },
+            errorsWrapper: "<div class='btn alert-danger ml-2'></div>",
+            errorTemplate: "<span></span>"
+        }
+    }
+        
     $('form').parsley(parsleyValiationOptions);
     
     $('form').on('form:validate', function(form) {

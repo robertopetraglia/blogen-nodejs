@@ -10,9 +10,3 @@ hbs.registerHelper('dateFormat', function(date, format) {
 hbs.registerHelper('loopCounter', function(value) {
     return parseInt(value) + 1
 })
-
-hbs.registerHelper('categoryFormat', async function(category_id) {
-    const catTitle   = await Category.getCategoryTitleById(category_id)
-    console.log('title: ', catTitle)
-    return catTitle
-})
