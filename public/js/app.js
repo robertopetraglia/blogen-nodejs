@@ -38,9 +38,22 @@ $(function() {
         return form.isValid()
     });
 
-    if (window.location.search.indexOf('pn') == 1) {
+    var querystringJSON = QueryStringToJSON();
+    if (querystringJSON.hasOwnProperty('pn') && parseInt(querystringJSON.pn) > 1) {
         $('#previous-page-item').removeClass('disabled')
     } else {
         $('#previous-page-item').addClass('disabled')
     }
 })
+
+function QueryStringToJSON() {            
+    var pairs = location.search.slice(1).split('&');
+    
+    var result = {};
+    pairs.forEach(function(pair) {
+        pair = pair.split('=');
+        result[pair[0]] = decodeURIComponent(pair[1] || '');
+    });
+
+    return JSON.parse(JSON.stringify(result));
+}

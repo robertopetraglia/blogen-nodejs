@@ -66,20 +66,19 @@
                                 {{/each}}
                             </tbody>
                         </table>
-                        {{numOfPages}}
                         {{#if (gt posts.length 0)}}
                             <div class="container">
                                 <ul class="pagination">
-                                    <li class="page-item disabled" id="previous-page-item">
-                                        <a class="page-link" href="#">Previous</a>
+                                    <li class="page-item {{#if (lteq prevPageNum 1)}} disabled {{/if}}" id="previous-page-item">
+                                        <a class="page-link" href="/user/posts?pn={{prevPageNum}}&skip=1">Previous</a>
                                     </li>
                                     {{#each pages}}
                                     <li class="page-item {{#if active}} active {{/if}}">
                                         <a class="page-link" href="/user/posts?pn={{pageNum}}&skip={{skip}}">{{pageNum}}</a>
                                     </li>
                                     {{/each}}
-                                    <li class="page-item">
-                                        <a class="page-link" href="#">Next</a>
+                                    <li class="page-item {{#if (gt nextPageNum pages.length)}} disabled {{/if}}" id="next-page-item">
+                                        <a class="page-link" href="/user/posts?pn={{nextPageNum}}&skip=1">Next</a>
                                     </li>
                                 </ul>
                             </div>

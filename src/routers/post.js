@@ -48,9 +48,23 @@ router.get('/user/posts', auth, async (req, res) => {
             })
         }
 
+        let nextPageNum = 2
+        if (req.query.pn !== undefined) {
+            nextPageNum = parseInt(req.query.pn) + 1 
+        }
+
+        let prevPageNum = 0
+        if (req.query.pn !== undefined) {
+            prevPageNum = parseInt(req.query.pn) - 1 
+        }
+
+        console.log(prevPageNum, nextPageNum)
+
         res.render('posts', {
             posts: req.user.posts,
-            pages
+            pages,
+            nextPageNum,
+            prevPageNum
         })
     } catch (e) {
         res.status(500).send()
