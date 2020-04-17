@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
 
 const postSchema = new mongoose.Schema({
     title: {
@@ -22,6 +23,15 @@ const postSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+postSchema.methods.toJSON = function () {
+    const post = this
+    const postObject = post.toObject()
+
+    postObject.createdAt = moment(postObject.createdAt).utc().format('MMM D YYYY HH:mm')
+
+    return postObject
+}
 
 const Post = mongoose.model('Post', postSchema)
 

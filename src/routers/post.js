@@ -19,9 +19,22 @@ router.post('/user/post/save', auth, async (req, res) => {
 })
 
 router.get('/user/posts', auth, async (req, res) => {
-    const documentsForPage = 1
-
     try {
+        const documentsForPage = 1
+        const totalPosts = await Post.countDocuments({})
+
+        res.render('posts', {
+            totalPosts: totalPosts / documentsForPage
+        })
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.get('/user/posts/getall', auth, async (req, res) => {
+    try {
+        const documentsForPage = 1
+
         await req.user.populate({
             path: 'posts',
             options: {
@@ -38,41 +51,49 @@ router.get('/user/posts', auth, async (req, res) => {
             post.category = category.title
         });
 
-        const totPosts = await Post.countDocuments({})
-        const pages = []
-        for (let i = 1; i <= (totPosts / documentsForPage); i++) {
-            pages.push({
-                pageNum: i,
-                skip: (i * documentsForPage) - documentsForPage,
-                active: (i == 1 && req.query.pn === undefined || req.query.pn == i) ? true : false
-            })
-        }
+        const totalPosts = await Post.countDocuments({})
 
-        let nextPageNum = 2
-        if (req.query.pn !== undefined) {
-            nextPageNum = parseInt(req.query.pn) + 1 
-        }
-
-        let prevPageNum = 0
-        if (req.query.pn !== undefined) {
-            prevPageNum = parseInt(req.query.pn) - 1 
-        }
-
-        console.log(prevPageNum, nextPageNum)
-
-        res.render('posts', {
+        res.json({
             posts: req.user.posts,
-            pages,
-            nextPageNum,
-            prevPageNum
+            totalPosts: totalPosts / documentsForPage
         })
     } catch (e) {
         res.status(500).send()
     }
 })
 
+router.get('/user/postsearch', auth, async (req, res) => {
+    try {
+        const posts = await Post.find({
+            title: { 
+                $regex: req.query.qs, 
+                $options: 'i',
+            },
+            owner: req.user._id
+        })        
+        .sort({'createdAt': -1})
+        
+        res.render('posts', {
+            posts,
+            totalPosts: posts.length,
+            isSearchPage: true,
+            searchString: req.query.qs
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
 router.get('/user/post/search', auth, async (req, res) => {
     try {
+        const documentsForPage = 1
+
+        let skip = 0
+        if (req.query.pn !== undefined) {
+            skip = (parseInt(req.query.pn) * documentsForPage) - documentsForPage
+        }
+
         const posts = await Post.find({
             title: { 
                 $regex: req.query.qs, 
@@ -81,14 +102,18 @@ router.get('/user/post/search', auth, async (req, res) => {
             owner: req.user._id
         })
         .sort({'createdAt': -1})
+        .skip(skip)
+        .limit(documentsForPage)
 
-        req.user.posts.map(post => {
+        const allCategories = await Category.getAllCategories()
+        posts.map(post => {
             let category = allCategories.find(category => category._id == post.category)
             post.category = category.title
         });
         
-        res.render('posts', {
-            posts
+        res.json({
+            posts,
+            totalPosts: posts.length / documentsForPage
         })
     } catch (e) {
         console.log(e.message)

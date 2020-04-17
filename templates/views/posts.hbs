@@ -18,7 +18,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12 ml-auto">
-                    <form id="search-post-form" class="user-form form-inline float-sm-right" action="/user/post/search">
+                    <form id="search-post-form" class="user-form form-inline float-sm-right" action="/user/postsearch">
                         <div class="form-group">
                             <input type="text" name="qs" id="qs" class="form-control mr-2" placeholder="Search Posts by title..." data-parsley-required="true">
                         </div>
@@ -38,9 +38,13 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Latest Posts</h4>
+                            {{#if isSearchPage}}
+                                <h4>Found {{posts.length}} results for {{searchString}}</h4>
+                            {{else}}
+                                <h4>Latest Posts</h4>
+                            {{/if}}
                         </div>
-                        <table class="table table-striped">
+                        <table class="table table-striped" id="posts-table">
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">#</th>
@@ -50,39 +54,16 @@
                                     <th scope="col"></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {{#each posts}}
-                                    <tr>
-                                        <td>{{loopCounter @index}}</td>
-                                        <td>{{title}}</td>
-                                        <td>{{category}}</td>
-                                        <td>{{dateFormat createdAt "MMM D YYYY HH:mm"}}</td>
-                                        <td>
-                                            <a href="/user/post/details?_id={{_id}}" class="btn btn-secondary">
-                                                <i class="fas fa-angle-double-right"></i> Details
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {{/each}}
+                            <tbody>                                
                             </tbody>
                         </table>
-                        {{#if (gt posts.length 0)}}
-                            <div class="container">
-                                <ul class="pagination">
-                                    <li class="page-item {{#if (lteq prevPageNum 1)}} disabled {{/if}}" id="previous-page-item">
-                                        <a class="page-link" href="/user/posts?pn={{prevPageNum}}&skip=1">Previous</a>
-                                    </li>
-                                    {{#each pages}}
-                                    <li class="page-item {{#if active}} active {{/if}}">
-                                        <a class="page-link" href="/user/posts?pn={{pageNum}}&skip={{skip}}">{{pageNum}}</a>
-                                    </li>
-                                    {{/each}}
-                                    <li class="page-item {{#if (gt nextPageNum pages.length)}} disabled {{/if}}" id="next-page-item">
-                                        <a class="page-link" href="/user/posts?pn={{nextPageNum}}&skip=1">Next</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        {{/if}}
+                        <div class="container" id="posts-pagination" 
+                            data-total-posts="{{totalPosts}}"
+                            {{#if isSearchPage}}
+                                data-post-search="true"
+                            {{/if}}
+                        >
+                        </div>
                     </div>
                 </div>
             </div>
