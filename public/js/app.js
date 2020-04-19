@@ -57,7 +57,7 @@ $(function() {
         let qsJSON = QueryStringToJSON();
         
         let baseTargetUrl = (paginationContainer.data('search-page') === undefined) ? paginationContainer.data('target-url') : paginationContainer.data('target-search-url')
-        if (paginationContainer.data('post-search') === undefined) {
+        if (paginationContainer.data('search-page') === undefined) {
             $.LoadingOverlay("show");
             $.getJSON(baseTargetUrl, function (data) {
                 $("table tbody").html(populateRows(data));

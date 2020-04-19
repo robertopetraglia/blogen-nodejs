@@ -154,7 +154,8 @@ router.get('/user/post/search', auth, async (req, res) => {
         res.json({
             type: 'posts',
             posts,
-            totalPages: Math.ceil(posts.length / documentsForPage)
+            totalPages: Math.ceil(posts.length / documentsForPage),
+            documentsForPage
         })
     } catch (e) {
         console.log(e.message)
