@@ -55,7 +55,8 @@
                             </tbody>
                         </table>
                         <div class="container pagination-container"
-                            data-total-elems="{{totalCategories}}"
+                            data-total-elems="{{totalPages}}"
+                            data-doc-for-page="{{documentsForPage}}"
                             data-target-url="/user/categories/getall"
                             {{#if isSearchPage}}
                                 data-search-page="true"

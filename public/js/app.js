@@ -71,9 +71,21 @@ $(function() {
             })
         }
 
+        let maxVisible = 5
+        let totElems = parseInt(paginationContainer.data('total-elems'))
+        let docForPage = parseInt(paginationContainer.data('doc-for-page'))
+        
+        if (Math.ceil(totElems / docForPage) <= 5) {
+            maxVisible = Math.ceil(totElems / docForPage)
+        }
+
+        if ((totElems / docForPage) == 1) {
+            maxVisible = docForPage
+        }
+
         let bootpag = paginationContainer.bootpag({
             total: paginationContainer.data('total-elems'),
-            maxVisible: 5,
+            maxVisible: maxVisible,
             prev: 'Previous',
             next: 'Next',
             leaps: true
@@ -83,13 +95,13 @@ $(function() {
             if (paginationContainer.data('search-page') === undefined) {
                 $.LoadingOverlay("show");
                 $.getJSON(baseTargetUrl + '?pn=' + num, function (data) {
-                    $("table tbody").html(populateRows(data));
+                    $("table tbody").html(populateRows(data, num));
                     $.LoadingOverlay("hide");
                 })
             } else {
                 $.LoadingOverlay("show");
                 $.getJSON(baseTargetUrl + '?qs=' + qsJSON.qs + '&pn=' + num, function (data) {
-                    $("table tbody").html(populateRows(data));
+                    $("table tbody").html(populateRows(data, num));
                     $.LoadingOverlay("hide");
                 })
             }
@@ -113,9 +125,12 @@ function QueryStringToJSON() {
     return JSON.parse(JSON.stringify(result));
 }
 
-function populateRows(data) {
+function populateRows(data, num) {
     let rowsHtml = ''
     let index = 1
+    if (num !== undefined && num > 1) {
+        index = ((num * data.documentsForPage) - data.documentsForPage) + 1
+    }
     if (data.type === 'posts') {
         data.posts.forEach(function(post) {
             rowsHtml += `

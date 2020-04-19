@@ -18,12 +18,13 @@ router.post('/user/category/save', auth, async (req, res) => {
 
 router.get('/user/categories', auth, async (req, res) => {
     try {
-        const documentsForPage = 1
+        const documentsForPage = 2
         const totalCategories = await Category.countDocuments({})
 
         res.render('categories', {
-            totalCategories: totalCategories / documentsForPage,
-            pageTitle: 'Posts | Blogen Categories'
+            totalPages: Math.ceil(totalCategories / documentsForPage),
+            documentsForPage,
+            pageTitle: 'Categories | Blogen Categories'
         })
     } catch (e) {
         res.status(500).send()
@@ -32,16 +33,27 @@ router.get('/user/categories', auth, async (req, res) => {
 
 router.get('/user/categories/getall', auth, async (req, res) => {
     try {
-        const documentsForPage = 1
+        const documentsForPage = 2
+
+        let pn = req.query.pn === undefined ? 1 : req.query.pn
+        
+        let skip = (pn * documentsForPage) - documentsForPage
+        if (skip <= 0) {
+            skip = 0
+        } 
+
         const allCategories = await Category.find({})
             .limit(documentsForPage)
-            .skip(parseInt(req.query.pn) - documentsForPage)
+            .skip(skip)
             .sort({'createdAt': -1})
+
+        const totalCategories = await Category.countDocuments({})
 
         res.json({
             type: 'categories',
             categories: allCategories,
-            totalPosts: allCategories.length / documentsForPage
+            totalPages: Math.ceil(totalCategories / documentsForPage),
+            documentsForPage
         })
     } catch (e) {
         console.log(e.message)

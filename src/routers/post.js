@@ -47,11 +47,12 @@ router.post('/user/post/editsave/:id', auth, async (req, res) => {
 
 router.get('/user/posts', auth, async (req, res) => {
     try {
-        const documentsForPage = 1
+        const documentsForPage = 3
         const totalPosts = await Post.countDocuments({})
 
         res.render('posts', {
-            totalPosts: totalPosts / documentsForPage,
+            totalPages: Math.ceil(totalPosts / documentsForPage),
+            documentsForPage,
             pageTitle: 'Posts | Blogen Search Post'
         })
     } catch (e) {
@@ -61,13 +62,20 @@ router.get('/user/posts', auth, async (req, res) => {
 
 router.get('/user/posts/getall', auth, async (req, res) => {
     try {
-        const documentsForPage = 1
+        const documentsForPage = 3
+
+        let pn = req.query.pn === undefined ? 1 : req.query.pn
+        
+        let skip = (pn * documentsForPage) - documentsForPage
+        if (skip <= 0) {
+            skip = 0
+        }
 
         await req.user.populate({
             path: 'posts',
             options: {
                 limit: documentsForPage,
-                skip: parseInt(req.query.pn) - documentsForPage,
+                skip,
                 sort: { 'createdAt': -1 }
             }
         }).execPopulate()
@@ -84,7 +92,8 @@ router.get('/user/posts/getall', auth, async (req, res) => {
         res.json({
             type: 'posts',
             posts: req.user.posts,
-            totalPosts: totalPosts / documentsForPage
+            documentsForPage,
+            totalPages: Math.ceil(totalPosts / documentsForPage)
         })
     } catch (e) {
         res.status(500).send()
@@ -105,7 +114,7 @@ router.get('/user/postsearch', auth, async (req, res) => {
         res.render('posts', {
             type: 'posts',
             posts,
-            totalPosts: posts.length,
+            totalPages: posts.length,
             isSearchPage: true,
             searchString: req.query.qs,
             pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Post'
@@ -145,7 +154,7 @@ router.get('/user/post/search', auth, async (req, res) => {
         res.json({
             type: 'posts',
             posts,
-            totalPosts: posts.length / documentsForPage
+            totalPages: Math.ceil(posts.length / documentsForPage)
         })
     } catch (e) {
         console.log(e.message)
