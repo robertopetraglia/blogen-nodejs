@@ -58,7 +58,8 @@ router.get('/user/dashboard', auth, async (req, res) => {
             posts: req.user.posts,
             totUsers,
             totCategories,
-            allCategories
+            allCategories,
+            totalPosts: req.user.posts.length
         })
     } catch (e) {
         res.status(500).send()

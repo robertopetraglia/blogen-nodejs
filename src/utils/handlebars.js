@@ -18,6 +18,6 @@ hbs.registerHelper('lteq', function(a, b) {
     return (a <= b);
 });
 
-hbs.registerHelper('eq', function(a, b) { 
+hbs.registerHelper('eq', function(a, b) {
     return (a == b);
 });

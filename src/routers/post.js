@@ -18,13 +18,41 @@ router.post('/user/post/save', auth, async (req, res) => {
     }
 })
 
+router.post('/user/post/editsave/:id', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['title', 'category', 'body']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/post/edit?_id=' + req.params.id)
+    }
+
+    try {
+        const post = await Post.findOne({ _id: req.params.id, owner: req.user._id })
+        if (!post) {
+            return res.status(404).send()
+        }
+
+        updates.forEach((update) => post[update] = req.body[update])
+        await post.save()
+
+        req.flash('success', 'Post successfully saved')
+        return res.redirect('/user/post/edit?_id=' + req.params.id)
+    } catch (e) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/post/edit?_id=' + req.params.id)
+    }
+})
+
 router.get('/user/posts', auth, async (req, res) => {
     try {
         const documentsForPage = 1
         const totalPosts = await Post.countDocuments({})
 
         res.render('posts', {
-            totalPosts: totalPosts / documentsForPage
+            totalPosts: totalPosts / documentsForPage,
+            pageTitle: 'Posts | Blogen Search Post'
         })
     } catch (e) {
         res.status(500).send()
@@ -54,6 +82,7 @@ router.get('/user/posts/getall', auth, async (req, res) => {
         const totalPosts = await Post.countDocuments({})
 
         res.json({
+            type: 'posts',
             posts: req.user.posts,
             totalPosts: totalPosts / documentsForPage
         })
@@ -74,10 +103,12 @@ router.get('/user/postsearch', auth, async (req, res) => {
         .sort({'createdAt': -1})
         
         res.render('posts', {
+            type: 'posts',
             posts,
             totalPosts: posts.length,
             isSearchPage: true,
-            searchString: req.query.qs
+            searchString: req.query.qs,
+            pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Post'
         })
     } catch (e) {
         console.log(e.message)
@@ -112,9 +143,41 @@ router.get('/user/post/search', auth, async (req, res) => {
         });
         
         res.json({
+            type: 'posts',
             posts,
             totalPosts: posts.length / documentsForPage
         })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/post/edit', auth, async (req, res) => {
+    try {
+        const post = await Post.findOne({ _id: req.query._id, owner: req.user._id })
+        const allCategories = await Category.getAllCategories()
+        res.render('editpost', {
+            post,
+            allCategories,
+            pageTitle: 'Edit post ' + post.title + ' | Blogen Edit Post'
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/post/delete/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
+        
+        if (!post) {
+            return res.status(404).send()
+        }
+
+        req.flash('success', 'Blog ' + post.title + ' deleted successfully')
+        res.redirect('/user/dashboard')
     } catch (e) {
         console.log(e.message)
         res.status(500).send()
