@@ -18,13 +18,15 @@
     <section id="search" class="py-4 mb-4 bg-light">
         <div class="container">
             <div class="row">
-                <div class="col-md-6 ml-auto">
-                    <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search Categories...">
-                        <div class="input-group-append">
-                          <button class="btn btn-success">Search</button>
+                <div class="col-md-12 ml-auto">
+                    <form id="search-categories-form" class="user-form form-inline float-sm-right form-search" action="/user/categorysearch">
+                        <div class="form-group">
+                            <input type="text" name="qs" id="qs" class="form-control mr-2" placeholder="Search Categories by title..." data-parsley-required="true">
                         </div>
-                      </div>
+                        <div class="btn-submit">
+                            <input type="submit" id="btn-search-category" class="btn btn-success btn-search" value="Search" />
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>        
@@ -40,7 +42,11 @@
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>Latest Categories</h4>
+                            {{#if isSearchPage}}
+                                <h4>Found <span class="text-info">{{categories.length}}</span> results for <span class="text-info">{{searchString}}</span></h4>
+                            {{else}}
+                                <h4>Latest Categories</h4>
+                            {{/if}}
                         </div>
                         <table class="table table-striped">
                             <thead class="thead-dark">
@@ -60,7 +66,7 @@
                             data-target-url="/user/categories/getall"
                             {{#if isSearchPage}}
                                 data-search-page="true"
-                                data-target-search-url="/user/categories/search"
+                                data-target-search-url="/user/category/search"
                             {{/if}}
                         >
                         </div>

@@ -15,14 +15,14 @@ $(function() {
     });
 
     window.Parsley.on('field:success', function() {
-        if ($('form#search-post-form').length) {
-            $('#btn-search-post').next().remove()
+        if ($('form.form-search').length) {
+            $('.btn-search').next().remove()
         } else {
             this.$element.next().remove()
         }
     });
 
-    if ($('form#search-post-form').length) {
+    if ($('form.form-search').length) {
         parsleyValiationOptions = {
             errorsContainer: function (el) {
                 return el.$element.parent().next();
@@ -84,7 +84,7 @@ $(function() {
         }
 
         let bootpag = paginationContainer.bootpag({
-            total: paginationContainer.data('total-elems'),
+            total: totElems,
             maxVisible: maxVisible,
             prev: 'Previous',
             next: 'Next',

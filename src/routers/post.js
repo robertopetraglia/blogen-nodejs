@@ -115,6 +115,7 @@ router.get('/user/postsearch', auth, async (req, res) => {
             type: 'posts',
             posts,
             totalPages: posts.length,
+            documentsForPage,
             isSearchPage: true,
             searchString: req.query.qs,
             pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Post'
