@@ -130,6 +130,7 @@ router.get('/user/users', auth, async (req, res) => {
         const totalUsers = await User.countDocuments({})
 
         res.render('users', {
+            name: req.user.name,
             totalPages: Math.ceil(totalUsers / documentsForPage),
             documentsForPage,
             pageTitle: 'Users | Blogen Search User'
@@ -234,6 +235,7 @@ router.get('/user/users/edit', auth, async (req, res) => {
         }
 
         res.render('edituser', {
+            name: req.user.name,
             user,
             pageTitle: 'Edit user ' + user.title + ' | Blogen Edit User'
         })
@@ -267,8 +269,18 @@ router.get('/user/profile', auth, async (req, res) => {
             res.status(404).send()
         }
 
+        let avatar = null
+        if (user.avatar) {
+            let avatarBuffer = new Buffer(req.user.avatar, 'base64')
+            avatar = 'data:image/png;base64,' + avatarBuffer.toString('base64')
+        } else {
+            avatar = '/img/avatar.png'
+        }
+
         res.render('userprofile', {
+            name: req.user.name,
             user,
+            avatar,
             pageTitle: 'User profile | Blogen Edit User'
         })
     } catch (e) {
@@ -351,6 +363,60 @@ router.get('/user/profile/delete', auth, async (req, res) => {
 
         req.flash('success', 'User ' + user.name + ' deleted successfully')
         res.redirect('/login')
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+const multer = require('multer')
+const sharp = require('sharp')
+const upload = multer({
+    limits: {
+        fileSize: 1000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+            return cb(new Error('Please upload a JPG or PNG image'))
+        }
+        cb(undefined, true)
+    }
+})
+
+router.post('/user/profile/saveavatar', auth, upload.single('avatar'), async (req, res) => {
+    try {
+        if (!req.hasOwnProperty('file')) {
+            throw new Error('Error! You should send an image')
+        }
+
+        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+        req.user.avatar = buffer
+        await req.user.save()
+
+        let avatarBuffer = new Buffer(req.user.avatar, 'base64')
+        res.send({
+            'success': true,
+            'message': 'Image upload successfully',
+            'image': avatarBuffer.toString('base64')
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.send({
+            'success': false,
+            'message': e.message
+        })
+    }
+}, (error, req, res, next) => {
+    res.status(400).send({ error: error.message })
+})
+
+router.get('/user/profile/deleteavatar', auth, async (req, res) => {
+    try {
+        req.user.avatar = undefined
+        await req.user.save()
+
+        req.flash('success', 'Avatar deleted successfully')
+        res.redirect('/user/profile')
     } catch (e) {
         console.log(e.message)
         res.status(500).send()

@@ -50,6 +50,7 @@ router.get('/user/categories', auth, async (req, res) => {
         const totalCategories = await Category.countDocuments({})
 
         res.render('categories', {
+            name: req.user.name,
             totalPages: Math.ceil(totalCategories / documentsForPage),
             documentsForPage,
             pageTitle: 'Categories | Blogen Categories'
@@ -154,6 +155,7 @@ router.get('/user/category/edit', auth, async (req, res) => {
         }
 
         res.render('editcategory', {
+            name: req.user.name,
             category,
             pageTitle: 'Edit category ' + category.title + ' | Blogen Edit Category'
         })

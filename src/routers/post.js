@@ -51,6 +51,7 @@ router.get('/user/posts', auth, async (req, res) => {
         const totalPosts = await Post.countDocuments({})
 
         res.render('posts', {
+            name: req.user.name,
             totalPages: Math.ceil(totalPosts / documentsForPage),
             documentsForPage,
             pageTitle: 'Posts | Blogen Search Post'
@@ -174,6 +175,7 @@ router.get('/user/post/edit', auth, async (req, res) => {
 
         const allCategories = await Category.getAllCategories()
         res.render('editpost', {
+            name: req.user.name,
             post,
             allCategories,
             pageTitle: 'Edit post ' + post.title + ' | Blogen Edit Post'

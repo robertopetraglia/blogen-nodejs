@@ -75,9 +75,27 @@
                 </div>
                 <div class="col-md-3">
                     <p class="h3">Your Avatar</p>
-                    <img class="img-fluid" src="/img/avatar.png" />
-                    <button class="btn btn-primary btn-block mt-3">Edit Image</button>
-                    <button class="btn btn-danger btn-block">Delete Image</button>
+                    <img class="img-fluid" src="{{avatar}}" id="avatar-image" />
+
+                    <form method="post" action="#" enctype="multipart/form-data" id="upload-avatar-form"> 
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="avatar" name="avatar">
+                                <label class="custom-file-label">Choose image</label>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <button class="btn btn-block btn-primary" id="userImageUpload">Upload</button>
+                        </div>
+                    </form>
+
+                    <div class="col-md mt-2 px-0 d-none" id="upload-message-container">
+                        <div class="alert alert-danger" id="alert-message">
+                            <p class="lead" id="upload-message"></p>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger btn-block mt-2" data-toggle="modal" data-target="#deleteAvatarModal">Delete Image</button>
                 </div>
             </div>
         </div>
@@ -117,7 +135,7 @@
         </div>
     </div>
 
-    <!-- Delete User Modal -->
+    <!-- Delete Account Modal -->
     <div class="modal fade" id="deleteAccountModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -138,6 +156,27 @@
         </div>
     </div>
 
+    <!-- Delete Avatar Modal -->
+    <div class="modal fade" id="deleteAvatarModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Delete Avatar</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="h5 font-weight-bolder">Are you sure to delete avatar?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="delete-avatar-btn" data-delete-url="/user/profile/deleteavatar">DELETE</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+
     {{>scripts}}
 
     <script>
@@ -145,6 +184,41 @@
             $('#deleteAccountModal').on('shown.bs.modal', function(e) {
                 $("#delete-user-btn").on('click', function () {
                     window.location = $("#delete-user-btn").data('delete-url')
+                });
+            })
+
+            $('#userImageUpload').on('click', function(e) {
+                e.preventDefault()
+                $('#upload-message-container').removeClass('d-block').addClass('d-none')
+
+                var fd = new FormData(); 
+                var file = $('#avatar')[0].files[0]; 
+                fd.append('avatar', file); 
+       
+                $.ajax({ 
+                    url: '/user/profile/saveavatar', 
+                    type: 'post', 
+                    data: fd, 
+                    contentType: false, 
+                    processData: false, 
+                    success: function(result) { 
+                        $('#upload-message-container').removeClass('d-none').addClass('d-block')
+                        $('#upload-message').html(result.message)
+                        if(result.success) {
+                            $('#alert-message').removeClass('alert-danger').addClass('alert-success')
+                            $('#avatar-image').attr('src', 'data:image/png;base64,' + result.image)
+                        } 
+                    },
+                    error: function(jqXHR, exception) {
+                        $('#upload-message-container').html(exception)
+                        $('#upload-message').removeClass('d-none').addClass('d-block')
+                    }
+                }); 
+            })
+
+            $('#deleteAvatarModal').on('shown.bs.modal', function(e) {
+                $("#delete-avatar-btn").on('click', function () {
+                    window.location = $("#delete-avatar-btn").data('delete-url')
                 });
             })
         })
