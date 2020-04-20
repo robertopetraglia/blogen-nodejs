@@ -162,6 +162,21 @@ function populateRows(data, num) {
                 </tr>
             `
         })
+    }  else if (data.type === 'users') {
+        data.users.forEach(function(user) {
+            rowsHtml += `
+                <tr>
+                    <td>${index++}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>
+                        <a href="/user/users/edit?_id=${user._id}" class="btn btn-secondary">
+                            <i class="fas fa-angle-double-right"></i> Details
+                        </a>
+                    </td>
+                </tr>
+            `
+        })
     }
     return rowsHtml
 }

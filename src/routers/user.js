@@ -95,4 +95,105 @@ router.get('/user/logout', auth, async (req, res) => {
     }
 })
 
+router.get('/user/users', auth, async (req, res) => {
+    try {
+        const documentsForPage = 2
+        const totalUsers = await User.countDocuments({})
+
+        res.render('users', {
+            totalPages: Math.ceil(totalUsers / documentsForPage),
+            documentsForPage,
+            pageTitle: 'Users | Blogen Search User'
+        })
+    } catch (e) {
+        res.status(500).send()
+    }
+})
+
+router.get('/user/users/getall', auth, async (req, res) => {
+    try {
+        const documentsForPage = 2
+
+        let pn = req.query.pn === undefined ? 1 : req.query.pn
+        
+        let skip = (pn * documentsForPage) - documentsForPage
+        if (skip <= 0) {
+            skip = 0
+        } 
+
+        const allUsers = await User.find({})
+            .limit(documentsForPage)
+            .skip(skip)
+            .sort({'createdAt': -1})
+
+        const totalUsers = await User.countDocuments({})
+
+        res.json({
+            type: 'users',
+            users: allUsers,
+            totalPages: Math.ceil(totalUsers / documentsForPage),
+            documentsForPage
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/usersearch', auth, async (req, res) => {
+    try {
+        const users = await User.find({
+            name: { 
+                $regex: req.query.qs, 
+                $options: 'i',
+            }
+        })        
+        .sort({'createdAt': -1})
+        
+        res.render('users', {
+            type: 'users',
+            users,
+            totalPages: users.length,
+            documentsForPage: 1,
+            isSearchPage: true,
+            searchString: req.query.qs,
+            pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Users'
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/users/search', auth, async (req, res) => {
+    try {
+        const documentsForPage = 1
+
+        let skip = 0
+        if (req.query.pn !== undefined) {
+            skip = (parseInt(req.query.pn) * documentsForPage) - documentsForPage
+        }
+
+        const users = await User.find({
+            name: { 
+                $regex: req.query.qs, 
+                $options: 'i',
+            }
+        })
+        .sort({'createdAt': -1})
+        .skip(skip)
+        .limit(documentsForPage)
+        
+        res.json({
+            type: 'users',
+            users,
+            totalPages: Math.ceil(users.length / documentsForPage),
+            documentsForPage
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
 module.exports = router
