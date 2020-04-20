@@ -64,7 +64,10 @@ router.get('/user/dashboard', auth, async (req, res) => {
             documentsForPage: 3
         })
     } catch (e) {
-        res.status(500).send()
+        res.status(500).render('500', {
+            pageTitle: '500 Internal Server Error',
+            errorMessage: e.message
+        })
     }
 })
 

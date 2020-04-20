@@ -50,8 +50,7 @@ app.get('/', (req, res) => {
 
 app.get('*', (req, res) => {
     res.status(404).render('404', {
-        title: '404 Page not found',
-        errorMessage: 'Page not found'
+        pageTitle: '404 Page Not Found'
     })
 })  
 

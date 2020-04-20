@@ -12,3 +12,13 @@ body {
     border: 1px solid #f5c6cb;
 }
 
+footer {
+    height: 4vh;
+}
+
+.unexpected-error-page-container, .not-found-error-page-container {
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
