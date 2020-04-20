@@ -16,6 +16,34 @@ router.post('/user/category/save', auth, async (req, res) => {
     }
 })
 
+router.post('/user/category/editsave/:id', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['title']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/category/edit?_id=' + req.params.id)
+    }
+
+    try {
+        const category = await Category.findOne({ _id: req.params.id })
+
+        if (!category) {
+            return res.status(404).send()
+        }
+
+        updates.forEach((update) => category[update] = req.body[update])
+        await category.save()
+
+        req.flash('success', 'Category successfully saved')
+        return res.redirect('/user/category/edit?_id=' + req.params.id)
+    } catch (e) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/category/edit?_id=' + req.params.id)
+    }
+})
+
 router.get('/user/categories', auth, async (req, res) => {
     try {
         const documentsForPage = 2
@@ -111,6 +139,56 @@ router.get('/user/category/search', auth, async (req, res) => {
             totalPages: Math.ceil(categories.length / documentsForPage),
             documentsForPage
         })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/category/edit', auth, async (req, res) => {
+    try {
+        const category = await Category.findOne({ _id: req.query._id })
+        
+        if (!category) {
+            res.status(404).send()
+        }
+
+        res.render('editcategory', {
+            category,
+            pageTitle: 'Edit category ' + category.title + ' | Blogen Edit Category'
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/post/delete/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
+        
+        if (!post) {
+            return res.status(404).send()
+        }
+
+        req.flash('success', 'Blog ' + post.title + ' deleted successfully')
+        res.redirect('/user/dashboard')
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/category/delete/:id', auth, async (req, res) => {
+    try {
+        const category = await Category.findOneAndDelete({ _id: req.params.id })
+        
+        if (!category) {
+            return res.status(404).send()
+        }
+
+        req.flash('success', 'Category ' + category.title + ' deleted successfully')
+        res.redirect('/user/dashboard')
     } catch (e) {
         console.log(e.message)
         res.status(500).send()

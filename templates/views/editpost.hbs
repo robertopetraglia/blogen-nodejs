@@ -23,7 +23,7 @@
                     </a>
                 </div>
                 <div class="col-md-3">
-                    <a href="#" class="btn btn-success btn-block" id="edit-save-post">
+                    <a href="#" class="btn btn-success btn-block save-changes" id="edit-save-post">
                         <i class="fas fa-check"></i> Save Changes
                     </a>
                 </div>
@@ -49,7 +49,7 @@
                             <h4>Edit Post</h4>
                         </div>
                         <div class="card-body">
-                            <form id="add-post-form" class="user-form" method="POST" action="/user/post/editsave/{{post._id}}">
+                            <form id="add-post-form" class="user-form save-changes-form" method="POST" action="/user/post/editsave/{{post._id}}">
                                 <div class="form-group">
                                     <label for="title">Title</label>
                                     <input type="text" class="form-control" name="title" value="{{post.title}}"
@@ -118,7 +118,7 @@
 
     <script>
         $(function(){
-            $('#deletePostModal').on('shown.bs.modal', function(e) { console.log('modal deletePostModal shown')
+            $('#deletePostModal').on('shown.bs.modal', function(e) {
                 $("#delete-post-btn").on('click', function () {
                     window.location = $("#delete-post-btn").data('delete-url')
                 });

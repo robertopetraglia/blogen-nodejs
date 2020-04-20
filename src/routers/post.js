@@ -167,6 +167,11 @@ router.get('/user/post/search', auth, async (req, res) => {
 router.get('/user/post/edit', auth, async (req, res) => {
     try {
         const post = await Post.findOne({ _id: req.query._id, owner: req.user._id })
+
+        if (!post) {
+            res.status(404).send()
+        }
+
         const allCategories = await Category.getAllCategories()
         res.render('editpost', {
             post,

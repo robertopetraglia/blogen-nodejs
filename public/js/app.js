@@ -38,11 +38,11 @@ $(function() {
         return form.isValid()
     });
 
-    if ($('#edit-save-post').length) {
-        $('#edit-save-post').on('click', function(e) {
+    if ($('.save-changes').length) {
+        $('.save-changes').on('click', function(e) {
             e.preventDefault()
             
-            var form = $('#add-post-form')
+            var form = $('.save-changes-form')
             form.parsley().validate()
             if (form.parsley().isValid()){
                 return form.submit()
