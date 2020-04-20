@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>head}}
+
+<body>
+    {{>navbar}}
+
+    <!-- DASHBOARD -->
+    <header class="bg-primary text-white py-2">
+        <div class="container">
+            <h1>{{category.title}}</h1>
+        </div>
+    </header>
+
+    <!-- ACTIONS -->
+    <section id="actions" class="py-4 mb-4 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="/user/dashboard" class="btn btn-light btn-block">
+                        <i class="fas fa-arrow-left"></i> Back To Dashboard
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="#" class="btn btn-success btn-block save-changes" id="edit-save-user">
+                        <i class="fas fa-check"></i> Save Changes
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteUserModal">
+                        <i class="fas fa-trash"></i> Delete User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EDIT POST -->
+    <section id="edit-post">
+        <div class="container">
+            <div class="row">
+
+                {{>messages}}
+ 
+                <div class="col">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Edit User</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="add-user-form" class="user-form save-changes-form" method="POST" action="/user/users/editsave/{{user._id}}">
+                                <div class="form-group">
+                                    <label for="title">Name</label>
+                                    <input type="text" class="form-control" name="name" value="{{user.name}}"
+                                        data-parsley-required="true" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" class="form-control" value="{{user.email}}"
+                                        data-parsley-required="true"
+                                        data-parsley-type="email" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{>footer}}
+
+    <!-- Add Post Modal -->
+    <div class="modal fade" id="deleteUserModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Delete User</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="h5 font-weight-bolder">Are you sure to delete user?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="delete-user-btn" data-delete-url="/user/users/delete/{{user._id}}">DELETE</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    {{>scripts}}
+
+    <script>
+        $(function(){
+            $('#deleteUserModal').on('shown.bs.modal', function(e) {
+                $("#delete-user-btn").on('click', function () {
+                    window.location = $("#delete-user-btn").data('delete-url')
+                });
+            })
+        })
+    </script>
+</body>
+</html>

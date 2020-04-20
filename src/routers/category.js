@@ -163,22 +163,6 @@ router.get('/user/category/edit', auth, async (req, res) => {
     }
 })
 
-router.get('/user/post/delete/:id', auth, async (req, res) => {
-    try {
-        const post = await Post.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
-        
-        if (!post) {
-            return res.status(404).send()
-        }
-
-        req.flash('success', 'Blog ' + post.title + ' deleted successfully')
-        res.redirect('/user/dashboard')
-    } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
-    }
-})
-
 router.get('/user/category/delete/:id', auth, async (req, res) => {
     try {
         const category = await Category.findOneAndDelete({ _id: req.params.id })
