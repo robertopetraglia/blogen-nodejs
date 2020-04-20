@@ -49,7 +49,7 @@
                             <h4>Edit User</h4>
                         </div>
                         <div class="card-body">
-                            <form id="add-user-form" class="user-form save-changes-form" method="POST" action="/user/users/editsave/{{user._id}}">
+                            <form id="edit-user-form" class="user-form save-changes-form" method="POST" action="/user/users/editsave/{{user._id}}">
                                 <div class="form-group">
                                     <label for="title">Name</label>
                                     <input type="text" class="form-control" name="name" value="{{user.name}}"
@@ -71,7 +71,7 @@
 
     {{>footer}}
 
-    <!-- Add Post Modal -->
+    <!-- Delete User Modal -->
     <div class="modal fade" id="deleteUserModal">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

@@ -2,6 +2,7 @@ const express = require('express')
 const User = require('../models/user')
 const Category = require('../models/category')
 const auth = require('../middleware/auth')
+const bcrypt = require('bcryptjs')
 const router = new express.Router()
 
 router.get('/login', (req, res) => {
@@ -252,6 +253,104 @@ router.get('/user/users/delete/:id', auth, async (req, res) => {
 
         req.flash('success', 'User ' + user.title + ' deleted successfully')
         res.redirect('/user/dashboard')
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.get('/user/profile', auth, async (req, res) => {
+    try {
+        const user = await User.findOne({ _id: req.user._id })
+        
+        if (!user) {
+            res.status(404).send()
+        }
+
+        res.render('userprofile', {
+            user,
+            pageTitle: 'User profile | Blogen Edit User'
+        })
+    } catch (e) {
+        console.log(e.message)
+        res.status(500).send()
+    }
+})
+
+router.post('/user/profile/save', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['name', 'email', 'biography']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/profile')
+    }
+
+    try {
+        const user = await User.findOne({ _id: req.user.id })
+
+        if (!user) {
+            return res.status(404).send()
+        }
+
+        updates.forEach((update) => user[update] = req.body[update])
+        await user.save()
+
+        req.flash('success', 'User successfully saved')
+        return res.redirect('/user/profile')
+    } catch (e) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/profile')
+    }
+})
+
+router.post('/user/profile/changepassword', auth, async (req, res) => {
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ['password']
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
+
+    if (!isValidOperation) {
+        req.flash('error', 'Invalid updates!')
+        return res.redirect('/user/profile')
+    }
+
+    let pwdEqualPrev = bcrypt.compareSync(req.body.password, req.user.password)
+    if (pwdEqualPrev) {
+        req.flash('error', 'Invalid updates!...New password must be different from previous')
+        return res.redirect('/user/profile')
+    }
+
+    try {
+        const user = await User.findOne({ _id: req.user.id })
+
+        if (!user) {
+            return res.status(404).send()
+        }
+
+        updates.forEach((update) => user[update] = req.body[update])
+        await user.save()
+
+        req.flash('success', 'User successfully saved')
+        return res.redirect('/user/profile')
+    } catch (e) {
+        req.flash('error', 'Invalid updates!... Error message: ' + e.message)
+        return res.redirect('/user/profile')
+    }
+})
+
+router.get('/user/profile/delete', auth, async (req, res) => {
+    try {
+        const user = await User.findOneAndDelete({ _id: req.user.id })
+        
+        if (!user) {
+            return res.status(404).send()
+        }
+
+        await req.user.remove()
+
+        req.flash('success', 'User ' + user.name + ' deleted successfully')
+        res.redirect('/login')
     } catch (e) {
         console.log(e.message)
         res.status(500).send()
