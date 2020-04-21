@@ -132,7 +132,7 @@ router.get('/user/logout', auth, async (req, res) => {
 router.get('/user/users', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 2
-        const totalUsers = await wser.countDocuments({})
+        const totalUsers = await User.countDocuments({})
 
         res.render('users', {
             name: req.user.name,
@@ -231,7 +231,7 @@ router.get('/user/users/search', auth, async (req, res) => {
     }
 })
 
-router.get('/user/users/edit', auth, async (req, res) => {
+router.get('/user/users/edit', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.query._id })
         
@@ -245,10 +245,9 @@ router.get('/user/users/edit', auth, async (req, res) => {
             pageTitle: 'Edit user ' + user.title + ' | Blogen Edit User'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 router.get('/user/users/delete/:id', auth, async (req, res) => {
     try {
