@@ -9,6 +9,7 @@ require('./utils/handlebars')
 const userRouter = require('./routers/user')
 const postRouter = require('./routers/post')
 const categoryRouter = require('./routers/category')
+const { handleErrorToRender, handleErrorToJSON, ErrorHandler } = require('./helpers/errors')
 
 const app = express()
 const port = process.env.PORT || 3000
@@ -52,7 +53,15 @@ app.get('*', (req, res) => {
     res.status(404).render('404', {
         pageTitle: '404 Page Not Found'
     })
-})  
+})
+
+app.use((err, req, res, next) => {
+    if (err.outputFormat === 'render') {
+        handleErrorToRender(err, res)
+    } else {
+        handleErrorToJSON(err, res)
+    }
+})
 
 app.listen(port, () => {
     console.log('Server up and running on port ' + port)

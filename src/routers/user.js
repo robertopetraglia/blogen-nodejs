@@ -5,10 +5,18 @@ const auth = require('../middleware/auth')
 const bcrypt = require('bcryptjs')
 const router = new express.Router()
 
+const { ErrorHandler } = require('../helpers/errors')
+
+let asyncErrorWrapper = fn => (...args) => fn(...args).catch(args[2]);
+
 router.get('/login', (req, res) => {
-    res.render('login', {
-        pageTitle: 'Login | Blogen'
-    })
+    try {
+        res.render('login', {
+            pageTitle: 'Login | Blogen'
+        })
+    } catch (e) {
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal Server Error'})
+    }    
 })
 
 router.post('/user/create', async (req, res) => {
@@ -64,10 +72,7 @@ router.get('/user/dashboard', auth, async (req, res) => {
             documentsForPage: 3
         })
     } catch (e) {
-        res.status(500).render('500', {
-            pageTitle: '500 Internal Server Error',
-            errorMessage: e.message
-        })
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal Server Error'})
     }
 })
 
@@ -97,7 +102,7 @@ router.post('/user/users/editsave/:id', auth, async (req, res) => {
         const user = await User.findOne({ _id: req.params.id })
 
         if (!user) {
-            return res.status(404).send()
+            throw new ErrorHandler('404', 'User not found', 'render', { pageTitle: '404 Page Not Found'})
         }
 
         updates.forEach((update) => user[update] = req.body[update])
@@ -106,16 +111,13 @@ router.post('/user/users/editsave/:id', auth, async (req, res) => {
         req.flash('success', 'User successfully saved')
         return res.redirect('/user/users/edit?_id=' + req.params.id)
     } catch (e) {
-        req.flash('error', 'Invalid updates!')
+        req.flash('error', 'Invalid updates!...' + e.message)
         return res.redirect('/user/users/edit?_id=' + req.params.id)
     }
 })
 
 router.get('/user/logout', auth, async (req, res) => {
     try {
-        // req.user.tokens = req.user.tokens.filter((token) => {
-        //     return token.token !== req.session.token
-        // })
         req.user.tokens = []
         await req.user.save()
 
@@ -127,10 +129,10 @@ router.get('/user/logout', auth, async (req, res) => {
     }
 })
 
-router.get('/user/users', auth, async (req, res) => {
+router.get('/user/users', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 2
-        const totalUsers = await User.countDocuments({})
+        const totalUsers = await wser.countDocuments({})
 
         res.render('users', {
             name: req.user.name,
@@ -139,9 +141,9 @@ router.get('/user/users', auth, async (req, res) => {
             pageTitle: 'Users | Blogen Search User'
         })
     } catch (e) {
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 router.get('/user/users/getall', auth, async (req, res) => {
     try {
