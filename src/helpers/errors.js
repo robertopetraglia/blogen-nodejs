@@ -27,8 +27,11 @@ const handleErrorToJSON = (err, res) => {
     res.status(statusCode).json(params);
 };
 
+const asyncErrorWrapper = fn => (...args) => fn(...args).catch(args[2]);
+
 module.exports = {
     ErrorHandler,
     handleErrorToRender,
-    handleErrorToJSON
+    handleErrorToJSON,
+    asyncErrorWrapper
 };

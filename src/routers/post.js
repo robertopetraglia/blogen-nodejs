@@ -4,7 +4,9 @@ const Category = require('../models/category')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
-router.post('/user/post/save', auth, async (req, res) => {
+const { ErrorHandler, asyncErrorWrapper } = require('../helpers/errors')
+
+router.post('/user/post/save', auth, asyncErrorWrapper(async (req, res) => {
     const post = new Post({
         ...req.body,
         owner: req.user._id
@@ -14,9 +16,9 @@ router.post('/user/post/save', auth, async (req, res) => {
         await post.save()
         res.redirect('/user/dashboard')
     } catch (e) {
-        res.status(400).send({ error: true })
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 router.post('/user/post/editsave/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
@@ -31,7 +33,10 @@ router.post('/user/post/editsave/:id', auth, async (req, res) => {
     try {
         const post = await Post.findOne({ _id: req.params.id, owner: req.user._id })
         if (!post) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 Post not found',
+                message: 'Post Not Found'
+            })
         }
 
         updates.forEach((update) => post[update] = req.body[update])
@@ -45,7 +50,7 @@ router.post('/user/post/editsave/:id', auth, async (req, res) => {
     }
 })
 
-router.get('/user/posts', auth, async (req, res) => {
+router.get('/user/posts', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 3
         const totalPosts = await Post.countDocuments({})
@@ -57,11 +62,11 @@ router.get('/user/posts', auth, async (req, res) => {
             pageTitle: 'Posts | Blogen Search Post'
         })
     } catch (e) {
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/posts/getall', auth, async (req, res) => {
+router.get('/user/posts/getall', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 3
 
@@ -97,11 +102,11 @@ router.get('/user/posts/getall', auth, async (req, res) => {
             totalPages: Math.ceil(totalPosts / documentsForPage)
         })
     } catch (e) {
-        res.status(500).send()
+        throw new ErrorHandler('500', undefined, 'json', { message: e.message})
     }
-})
+}))
 
-router.get('/user/postsearch', auth, async (req, res) => {
+router.get('/user/postsearch', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const posts = await Post.find({
             title: { 
@@ -116,18 +121,17 @@ router.get('/user/postsearch', auth, async (req, res) => {
             type: 'posts',
             posts,
             totalPages: posts.length,
-            documentsForPage,
+            documentsForPage: 1,
             isSearchPage: true,
             searchString: req.query.qs,
             pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Post'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/post/search', auth, async (req, res) => {
+router.get('/user/post/search', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 1
 
@@ -160,17 +164,19 @@ router.get('/user/post/search', auth, async (req, res) => {
             documentsForPage
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', undefined, 'json', { message: e.message})
     }
-})
+}))
 
-router.get('/user/post/edit', auth, async (req, res) => {
+router.get('/user/post/edit', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const post = await Post.findOne({ _id: req.query._id, owner: req.user._id })
 
         if (!post) {
-            res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 Post not found',
+                message: 'Post Not Found'
+            })
         }
 
         const allCategories = await Category.getAllCategories()
@@ -181,25 +187,26 @@ router.get('/user/post/edit', auth, async (req, res) => {
             pageTitle: 'Edit post ' + post.title + ' | Blogen Edit Post'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/post/delete/:id', auth, async (req, res) => {
+router.get('/user/post/delete/:id', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const post = await Post.findOneAndDelete({ _id: req.params.id, owner: req.user._id })
         
         if (!post) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 Post not found',
+                message: 'Post not found'
+            })
         }
 
         req.flash('success', 'Blog ' + post.title + ' deleted successfully')
         res.redirect('/user/dashboard')
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 module.exports = router

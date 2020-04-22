@@ -51,7 +51,8 @@ app.get('/', (req, res) => {
 
 app.get('*', (req, res) => {
     res.status(404).render('404', {
-        pageTitle: '404 Page Not Found'
+        pageTitle: '404 Page Not Found',
+        message: 'Page Not Found!'
     })
 })
 

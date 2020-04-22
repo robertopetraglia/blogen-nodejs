@@ -3,7 +3,9 @@ const Category = require('../models/category')
 const auth = require('../middleware/auth')
 const router = new express.Router()
 
-router.post('/user/category/save', auth, async (req, res) => {
+const { ErrorHandler, asyncErrorWrapper } = require('../helpers/errors')
+
+router.post('/user/category/save', auth, asyncErrorWrapper(async (req, res) => {
     const category = new Category({
         ...req.body
     })
@@ -12,9 +14,9 @@ router.post('/user/category/save', auth, async (req, res) => {
         await category.save()
         res.redirect('/user/dashboard')
     } catch (e) {
-        res.status(400).send({ error: true })
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 router.post('/user/category/editsave/:id', auth, async (req, res) => {
     const updates = Object.keys(req.body)
@@ -30,7 +32,10 @@ router.post('/user/category/editsave/:id', auth, async (req, res) => {
         const category = await Category.findOne({ _id: req.params.id })
 
         if (!category) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 Category not found',
+                message: 'Category Not Found'
+            })
         }
 
         updates.forEach((update) => category[update] = req.body[update])
@@ -44,7 +49,7 @@ router.post('/user/category/editsave/:id', auth, async (req, res) => {
     }
 })
 
-router.get('/user/categories', auth, async (req, res) => {
+router.get('/user/categories', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 2
         const totalCategories = await Category.countDocuments({})
@@ -56,11 +61,11 @@ router.get('/user/categories', auth, async (req, res) => {
             pageTitle: 'Categories | Blogen Categories'
         })
     } catch (e) {
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/categories/getall', auth, async (req, res) => {
+router.get('/user/categories/getall', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 2
 
@@ -85,12 +90,11 @@ router.get('/user/categories/getall', auth, async (req, res) => {
             documentsForPage
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', undefined, 'json', { message: e.message})
     }
-})
+}))
 
-router.get('/user/categorysearch', auth, async (req, res) => {
+router.get('/user/categorysearch', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const categories = await Category.find({
             title: { 
@@ -110,12 +114,11 @@ router.get('/user/categorysearch', auth, async (req, res) => {
             pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Category'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/category/search', auth, async (req, res) => {
+router.get('/user/category/search', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 1
 
@@ -141,17 +144,19 @@ router.get('/user/category/search', auth, async (req, res) => {
             documentsForPage
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', undefined, 'json', { message: e.message})
     }
-})
+}))
 
-router.get('/user/category/edit', auth, async (req, res) => {
+router.get('/user/category/edit', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const category = await Category.findOne({ _id: req.query._id })
         
         if (!category) {
-            res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 Category not found',
+                message: 'Category Not Found'
+            })
         }
 
         res.render('editcategory', {
@@ -160,25 +165,26 @@ router.get('/user/category/edit', auth, async (req, res) => {
             pageTitle: 'Edit category ' + category.title + ' | Blogen Edit Category'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/category/delete/:id', auth, async (req, res) => {
+router.get('/user/category/delete/:id', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const category = await Category.findOneAndDelete({ _id: req.params.id })
         
         if (!category) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 Category not found',
+                message: 'User not found'
+            })
         }
 
         req.flash('success', 'Category ' + category.title + ' deleted successfully')
         res.redirect('/user/dashboard')
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 module.exports = router

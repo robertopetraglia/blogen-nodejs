@@ -62,11 +62,17 @@ $(function() {
             $.getJSON(baseTargetUrl, function (data) {
                 $("table tbody").html(populateRows(data));
                 $.LoadingOverlay("hide");
+            }).fail(function( jqxhr, textStatus, error ) {
+                showAjaxError( jqxhr, textStatus, error )
+                $.LoadingOverlay("hide");
             })
         } else {
             $.LoadingOverlay("show");
             $.getJSON(baseTargetUrl + '?qs=' + qsJSON.qs, function (data) {
                 $("table tbody").html(populateRows(data));
+                $.LoadingOverlay("hide");
+            }).fail(function( jqxhr, textStatus, error ) {
+                showAjaxError( jqxhr, textStatus, error )
                 $.LoadingOverlay("hide");
             })
         }
@@ -97,11 +103,17 @@ $(function() {
                 $.getJSON(baseTargetUrl + '?pn=' + num, function (data) {
                     $("table tbody").html(populateRows(data, num));
                     $.LoadingOverlay("hide");
+                }).fail(function( jqxhr, textStatus, error ) {
+                    showAjaxError( jqxhr, textStatus, error )
+                    $.LoadingOverlay("hide");
                 })
             } else {
                 $.LoadingOverlay("show");
                 $.getJSON(baseTargetUrl + '?qs=' + qsJSON.qs + '&pn=' + num, function (data) {
                     $("table tbody").html(populateRows(data, num));
+                    $.LoadingOverlay("hide");
+                }).fail(function( jqxhr, textStatus, error ) {
+                    showAjaxError( jqxhr, textStatus, error )
                     $.LoadingOverlay("hide");
                 })
             }
@@ -179,4 +191,31 @@ function populateRows(data, num) {
         })
     }
     return rowsHtml
+}
+
+function showAjaxError(jqxhr, textStatus, error) {
+    console.log(jqxhr, textStatus, error);
+    
+    let modalHTML = `<div class="modal" id="ajaxErrorModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">
+                                        <i class="fas fa-exclamation-triangle mr-2"></i>${error}
+                                    </h5>
+                                    <button type="button" class="close" data-dismiss="modal">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="text-info">${jqxhr.responseJSON.message}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`
+    $('footer').before(modalHTML)
+    $('#ajaxErrorModal').modal('show')
 }

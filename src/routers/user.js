@@ -5,9 +5,7 @@ const auth = require('../middleware/auth')
 const bcrypt = require('bcryptjs')
 const router = new express.Router()
 
-const { ErrorHandler } = require('../helpers/errors')
-
-let asyncErrorWrapper = fn => (...args) => fn(...args).catch(args[2]);
+const { ErrorHandler, asyncErrorWrapper } = require('../helpers/errors')
 
 router.get('/login', (req, res) => {
     try {
@@ -102,7 +100,10 @@ router.post('/user/users/editsave/:id', auth, async (req, res) => {
         const user = await User.findOne({ _id: req.params.id })
 
         if (!user) {
-            throw new ErrorHandler('404', 'User not found', 'render', { pageTitle: '404 Page Not Found'})
+            return res.stauts(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User Not Found'
+            })
         }
 
         updates.forEach((update) => user[update] = req.body[update])
@@ -145,7 +146,7 @@ router.get('/user/users', auth, asyncErrorWrapper(async (req, res) => {
     }
 }))
 
-router.get('/user/users/getall', auth, async (req, res) => {
+router.get('/user/users/getall', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 2
 
@@ -170,12 +171,11 @@ router.get('/user/users/getall', auth, async (req, res) => {
             documentsForPage
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', undefined, 'json', { message: e.message})
     }
-})
+}))
 
-router.get('/user/usersearch', auth, async (req, res) => {
+router.get('/user/usersearch', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const users = await User.find({
             name: { 
@@ -195,12 +195,11 @@ router.get('/user/usersearch', auth, async (req, res) => {
             pageTitle: 'You are searching for ' + req.query.qs + ' | Blogen Search Users'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/users/search', auth, async (req, res) => {
+router.get('/user/users/search', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const documentsForPage = 1
 
@@ -226,17 +225,19 @@ router.get('/user/users/search', auth, async (req, res) => {
             documentsForPage
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 router.get('/user/users/edit', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.query._id })
         
         if (!user) {
-            res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User Not Found'
+            })
         }
 
         res.render('edituser', {
@@ -249,28 +250,33 @@ router.get('/user/users/edit', auth, asyncErrorWrapper(async (req, res) => {
     }
 }))
 
-router.get('/user/users/delete/:id', auth, async (req, res) => {
+router.get('/user/users/delete/:id', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const user = await User.findOneAndDelete({ _id: req.params.id })
         
         if (!user) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User not found'
+            })
         }
 
-        req.flash('success', 'User ' + user.title + ' deleted successfully')
+        areq.flash('success', 'User ' + user.title + ' deleted successfully')
         res.redirect('/user/dashboard')
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
-router.get('/user/profile', auth, async (req, res) => {
+router.get('/user/profile', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.user._id })
         
         if (!user) {
-            res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User not found'
+            })
         }
 
         let avatar = null
@@ -288,10 +294,9 @@ router.get('/user/profile', auth, async (req, res) => {
             pageTitle: 'User profile | Blogen Edit User'
         })
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 router.post('/user/profile/save', auth, async (req, res) => {
     const updates = Object.keys(req.body)
@@ -307,7 +312,10 @@ router.post('/user/profile/save', auth, async (req, res) => {
         const user = await User.findOne({ _id: req.user.id })
 
         if (!user) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User not found'
+            })
         }
 
         updates.forEach((update) => user[update] = req.body[update])
@@ -341,7 +349,10 @@ router.post('/user/profile/changepassword', auth, async (req, res) => {
         const user = await User.findOne({ _id: req.user.id })
 
         if (!user) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User not found'
+            })
         }
 
         updates.forEach((update) => user[update] = req.body[update])
@@ -355,12 +366,15 @@ router.post('/user/profile/changepassword', auth, async (req, res) => {
     }
 })
 
-router.get('/user/profile/delete', auth, async (req, res) => {
+router.get('/user/profile/delete', auth, asyncErrorWrapper(async (req, res) => {
     try {
         const user = await User.findOneAndDelete({ _id: req.user.id })
         
         if (!user) {
-            return res.status(404).send()
+            return res.status(404).render('404', {
+                pageTitle: '404 User not found',
+                message: 'User not found'
+            })
         }
 
         await req.user.remove()
@@ -368,10 +382,9 @@ router.get('/user/profile/delete', auth, async (req, res) => {
         req.flash('success', 'User ' + user.name + ' deleted successfully')
         res.redirect('/login')
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 const multer = require('multer')
 const sharp = require('sharp')
@@ -387,13 +400,13 @@ const upload = multer({
     }
 })
 
-router.post('/user/profile/saveavatar', auth, upload.single('avatar'), async (req, res) => {
+router.post('/user/profile/saveavatar', auth, upload.single('avatar'), asyncErrorWrapper(async (req, res) => {
     try {
         if (!req.hasOwnProperty('file')) {
             throw new Error('Error! You should send an image')
         }
 
-        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+        const buffer = await ssharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
         req.user.avatar = buffer
         await req.user.save()
 
@@ -404,17 +417,19 @@ router.post('/user/profile/saveavatar', auth, upload.single('avatar'), async (re
             'image': avatarBuffer.toString('base64')
         })
     } catch (e) {
-        console.log(e.message)
         res.send({
             'success': false,
             'message': e.message
         })
     }
 }, (error, req, res, next) => {
-    res.status(400).send({ error: error.message })
-})
+    return res.status(404).render('404', {
+        pageTitle: '',
+        message: error
+    })
+}))
 
-router.get('/user/profile/deleteavatar', auth, async (req, res) => {
+router.get('/user/profile/deleteavatar', auth, asyncErrorWrapper(async (req, res) => {
     try {
         req.user.avatar = undefined
         await req.user.save()
@@ -422,9 +437,8 @@ router.get('/user/profile/deleteavatar', auth, async (req, res) => {
         req.flash('success', 'Avatar deleted successfully')
         res.redirect('/user/profile')
     } catch (e) {
-        console.log(e.message)
-        res.status(500).send()
+        throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
     }
-})
+}))
 
 module.exports = router
