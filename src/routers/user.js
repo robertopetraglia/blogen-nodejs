@@ -261,7 +261,7 @@ router.get('/user/users/delete/:id', auth, asyncErrorWrapper(async (req, res) =>
             })
         }
 
-        areq.flash('success', 'User ' + user.title + ' deleted successfully')
+        req.flash('success', 'User ' + user.title + ' deleted successfully')
         res.redirect('/user/dashboard')
     } catch (e) {
         throw new ErrorHandler('500', e.message, 'render', { pageTitle: '500 Internal server Error'})
@@ -406,7 +406,7 @@ router.post('/user/profile/saveavatar', auth, upload.single('avatar'), asyncErro
             throw new Error('Error! You should send an image')
         }
 
-        const buffer = await ssharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
         req.user.avatar = buffer
         await req.user.save()
 
