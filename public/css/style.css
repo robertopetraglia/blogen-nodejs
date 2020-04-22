@@ -5,15 +5,11 @@ body {
 
 .main-container {
     overflow: auto;
-    max-height: calc(100vh - 142px);
+    max-height: calc(100vh - 30px);
 }
 
 .form-control-danger {
     border: 1px solid #f5c6cb;
-}
-
-footer {
-    height: 4vh;
 }
 
 .unexpected-error-page-container, .not-found-error-page-container {
