@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>head}}
+
+<body>
+    
+    {{>navbar}}
+
+    <!-- DASHBOARD -->
+    <header class="bg-primary text-white py-2">
+        <div class="container">
+            <h1>
+                <i class="fas fa-user"></i> Edit Profile
+            </h1>
+        </div>
+    </header>
+
+    <!-- ACTIONS -->
+    <section id="actions" class="py-4 mb-4 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <a href="/user/dashboard" class="btn btn-light btn-block">
+                        <i class="fas fa-arrow-left"></i> Back To Dashboard
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#changePasswordModal">
+                        <i class="fas fa-trash"></i> Change Password
+                    </button>
+                </div>
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#deleteAccountModal">
+                        <i class="fas fa-trash"></i> Delete Account
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EDIT PROFILE -->
+    <section id="edit-post">
+        <div class="container">
+            <div class="row">
+
+                {{>messages}}
+
+                <div class="col-md-9">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Edit Profile</h4>
+                        </div>
+                        <div class="card-body">
+                            <form id="profile-user-form" class="user-form save-changes-form" method="POST" action="/user/profile/save">
+                                <div class="form-group">
+                                    <label for="title">Name</label>
+                                    <input type="text" class="form-control" name="name" value="{{user.name}}"
+                                        data-parsley-required="true" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email" name="email" class="form-control" value="{{user.email}}"
+                                        data-parsley-required="true"
+                                        data-parsley-type="email" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="body">Biography</label>
+                                    <textarea name="biography" class="form-control">{{user.biography}}</textarea>
+                                </div>
+                                <input type="submit" class="btn btn-primary btn-block" value="Save changes" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <p class="h3">Your Avatar</p>
+                    <img class="img-fluid" src="{{avatar}}" id="avatar-image" />
+
+                    <form method="post" action="#" enctype="multipart/form-data" id="upload-avatar-form"> 
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="avatar" name="avatar">
+                                <label class="custom-file-label">Choose image</label>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <button class="btn btn-block btn-primary" id="userImageUpload">Upload</button>
+                        </div>
+                    </form>
+
+                    <div class="col-md mt-2 px-0 d-none" id="upload-message-container">
+                        <div class="alert alert-danger" id="alert-message">
+                            <p class="lead" id="upload-message"></p>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger btn-block mt-2" data-toggle="modal" data-target="#deleteAvatarModal">Delete Image</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{>footer}}
+
+    <!-- Change Password Modal -->
+    <div class="modal fade" id="changePasswordModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Change User Password</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="change-password-form" class="user-form" method="POST" action="/user/profile/changepassword" data-parsley-validate="">
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control"
+                                data-parsley-required="true">
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Confirm Password</label>
+                            <input type="password" class="form-control"
+                                data-parsley-required="true"
+                                data-parsley-equalto="#password"
+                                data-parsley-error-message="Password and confirm password are not equal">
+                        </div>
+                        <hr class="mt-2 mb-2">
+                        <input type="submit" class="btn btn-success btn-block" />
+                    </form>
+                </div>              
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Delete Account</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="h5 font-weight-bolder">Are you sure to delete account?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="delete-user-btn" data-delete-url="/user/profile/delete">DELETE</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Avatar Modal -->
+    <div class="modal fade" id="deleteAvatarModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title">Delete Avatar</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="h5 font-weight-bolder">Are you sure to delete avatar?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" id="delete-avatar-btn" data-delete-url="/user/profile/deleteavatar">DELETE</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    {{>scripts}}
+
+    <script>
+        $(function(){
+            $('#deleteAccountModal').on('shown.bs.modal', function(e) {
+                $("#delete-user-btn").on('click', function () {
+                    window.location = $("#delete-user-btn").data('delete-url')
+                });
+            })
+
+            $('#userImageUpload').on('click', function(e) {
+                e.preventDefault()
+                $('#upload-message-container').removeClass('d-block').addClass('d-none')
+
+                var fd = new FormData(); 
+                var file = $('#avatar')[0].files[0]; 
+                fd.append('avatar', file); 
+       
+                $.ajax({ 
+                    url: '/user/profile/saveavatar', 
+                    type: 'post', 
+                    data: fd, 
+                    contentType: false, 
+                    processData: false, 
+                    success: function(result) { 
+                        $('#upload-message-container').removeClass('d-none').addClass('d-block')
+                        $('#upload-message').html(result.message)
+                        if(result.success) {
+                            $('#alert-message').removeClass('alert-danger').addClass('alert-success')
+                            $('#avatar-image').attr('src', 'data:image/png;base64,' + result.image)
+                        } 
+                    },
+                    error: function(jqXHR, exception) {
+                        $('#upload-message-container').html(exception)
+                        $('#upload-message').removeClass('d-none').addClass('d-block')
+                    }
+                }); 
+            })
+
+            $('#deleteAvatarModal').on('shown.bs.modal', function(e) {
+                $("#delete-avatar-btn").on('click', function () {
+                    window.location = $("#delete-avatar-btn").data('delete-url')
+                });
+            })
+        })
+    </script>
+</body>
+</html>

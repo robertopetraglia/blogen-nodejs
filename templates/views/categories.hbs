@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>head}}
+
+<body>
+    
+    {{>navbar}}
+
+    <!-- DASHBOARD -->
+    <header class="bg-success text-white py-2">
+        <div class="container">
+            <h1><i class="fas fa-folder"></i> Categories <h1></h1>
+        </div>
+    </header>
+
+    <!-- SEARCh -->
+    <section id="search" class="py-4 mb-4 bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 ml-auto">
+                    <form id="search-categories-form" class="user-form form-inline float-sm-right form-search" action="/user/categorysearch">
+                        <div class="form-group">
+                            <input type="text" name="qs" id="qs" class="form-control mr-2" placeholder="Search by title..." data-parsley-required="true">
+                        </div>
+                        <div class="btn-submit">
+                            <input type="submit" id="btn-search-category" class="btn btn-success btn-search" value="Search" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>        
+    </section>
+
+    <!-- POSTS -->
+    <section id="posts">
+        <div class="container">
+            <div class="row">
+
+                {{>messages}}
+
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header">
+                            {{#if isSearchPage}}
+                                <h4>Found <span class="text-info">{{categories.length}}</span> results for <span class="text-info">{{searchString}}</span></h4>
+                            {{else}}
+                                <h4>Latest Categories</h4>
+                            {{/if}}
+                        </div>
+                        <table class="table table-striped">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Title</th>
+                                    <th scope="col">Date</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <div class="container pagination-container"
+                            data-total-elems="{{totalPages}}"
+                            data-doc-for-page="{{documentsForPage}}"
+                            data-target-url="/user/categories/getall"
+                            {{#if isSearchPage}}
+                                data-search-page="true"
+                                data-target-search-url="/user/category/search"
+                            {{/if}}
+                        >
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{>footer}}
+
+    {{>scripts}}
+
+</body>
+</html>

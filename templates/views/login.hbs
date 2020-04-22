@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>head}}
+
+<body class="d-flex flex-column">
+    <div class="main-container">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark p-0">
+            <div class="container">
+                <a class="navbar-brand" href="/">Blogen</a>
+            </div>            
+        </nav>
+
+        <header class="bg-primary text-white py-2">
+            <div class="container">
+                <h1><i class="fas fa-user"></i>  Blogen Login<h1>
+            </div>
+        </header>
+
+        <!-- ACTIONS -->
+        <section id="actions" class="py-4 mb-4 bg-light">
+            
+        </section>
+
+        <!-- EDIT POST -->
+        <section id="settings">
+            <div class="container">
+                <div class="row">
+                    
+                    {{>messages}}
+
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Account Login</h4>
+                            </div>
+                            <div class="card-body">
+                                <form id="login-form" class="user-form" method="POST" action="/user/auth" data-parsley-validate="">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" name="email" class="form-control"
+                                            data-parsley-required="true"
+                                            data-parsley-type="email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" name="password" class="form-control"
+                                            data-parsley-required="true">
+                                    </div>
+                                    <input type="submit" class="btn btn-primary btn-block" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-3 mt-sm-3 mt-md-0 mt-lg-0">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Register an account</h4>
+                            </div>
+                            <div class="card-body">
+                                <form id="login-form" class="user-form" method="POST" action="/user/create" data-parsley-validate="">
+                                    <div class="form-group">
+                                        <label for="name">Name</label>
+                                        <input type="name" name="name" class="form-control"
+                                            data-parsley-required="true">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" name="email" class="form-control"
+                                            data-parsley-required="true"
+                                            data-parsley-type="email">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" id="password" name="password" class="form-control"
+                                            data-parsley-required="true">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="password">Confirm Password</label>
+                                        <input type="password" name="confirm-password" class="form-control"
+                                            data-parsley-required="true"
+                                            data-parsley-equalto="#password"
+                                            data-parsley-error-message="Password and confirm password are not equal">
+                                    </div>
+                                    <input type="submit" class="btn btn-success btn-block" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    {{>footer}}
+
+    {{>scripts}}
+
+</body>
+</html>

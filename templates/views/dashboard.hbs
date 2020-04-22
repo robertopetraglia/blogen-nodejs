@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+{{>head}}
+
+<body class="d-flex flex-column">
+    <div class="main-container">
+
+        {{>navbar}}
+
+        <!-- DASHBOARD -->
+        <header class="bg-primary text-white py-2">
+            <div class="container">
+                <h1><i class="fas fa-cog"></i> Dashboard <h1>
+            </div>
+        </header>
+
+        <!-- ACTIONS -->
+        <section id="actions" class="py-4 mb-4 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <button type="button" id="add-post-btn" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addPostModal">
+                            <i class="fas fa-plus"></i> Add Post
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-success btn-block" data-toggle="modal" data-target="#addCategoryModal">
+                            <i class="fas fa-plus"></i> Add Category
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-warning btn-block" data-toggle="modal" data-target="#addUserModal">
+                            <i class="fas fa-plus"></i> Add User
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- POSTS -->
+        <section id="posts">
+            <div class="container">
+                <div class="row">
+
+                    {{>messages}}
+
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Latest Posts</h4>
+                            </div>
+                            <table class="table table-striped" id="posts-table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Title</th>
+                                        <th scope="col">Category</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>                                
+                                </tbody>
+                            </table>
+                            <div class="container pagination-container"
+                                data-total-elems="{{totalPosts}}"                                                            
+                                data-doc-for-page="{{documentsForPage}}"
+                                data-target-url="/user/posts/getall">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white text-center mb-3">
+                            <div class="card-body">
+                                <h3>Posts</h3>
+                                <h4 class="display-4">
+                                    <i class="fas fa-pencil-alt"></i> {{posts.length}}
+                                </h4>
+                                <a href="/user/posts" class="btn btn-outline-light btn-sm">View</a>
+                            </div>
+                        </div>
+                        <div class="card bg-success text-white text-center mb-3">
+                            <div class="card-body">
+                                <h3>Categories</h3>
+                                <h4 class="display-4">
+                                    <i class="fas fa-folder"></i> {{totCategories}}
+                                </h4>
+                                <a href="/user/categories" class="btn btn-outline-light btn-sm">View</a>
+                            </div>
+                        </div>
+                        <div class="card bg-warning text-white text-center mb-3">
+                            <div class="card-body">
+                                <h3>Users</h3>
+                                <h4 class="display-4">
+                                    <i class="fas fa-users"></i> {{totUsers}}
+                                </h4>
+                                <a href="/user/users" class="btn btn-outline-light btn-sm">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    {{>footer}}
+
+    <!-- MODALS -->
+
+    <!-- Add Post Modal -->
+    <div class="modal fade" id="addPostModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Add Post</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-post-form" class="user-form" method="POST" action="/user/post/save">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" name="title" class="form-control" 
+                                data-parsley-required="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select name="category" class="form-control" data-parsley-required="true">
+                                <option value="">--- Select --- </option>
+                                {{#each allCategories}}
+                                    <option value="{{_id}}">{{title}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <label for="title">Upload Image</label>
+                            <div class="input-group">
+                                <label for="title" class="custom-file-label">Choose File</label>
+                                <div class="custum-file">
+                                    <input type="file" class="custom-file-input" />
+                                </div>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Browse</span>
+                                </div>
+                            </div>
+                            <small class="text-muted">Max Size 3mb</small>
+                        </div>
+                        -->
+                        <div class="form-group">
+                            <label for="body">Body</label>
+                            <textarea name="body" id="editor1" class="form-control" data-parsley-required="true"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit"  class="btn btn-primary" value="Save Changes" />
+                        </div>
+                    </form>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal fade" id="addCategoryModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Add Category</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-category-form" class="user-form" method="POST" action="/user/category/save">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input type="text" name="title" class="form-control"
+                                data-parsley-required="true" />
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit"  class="btn btn-success" value="Save Changes" />
+                        </div>
+                    </form>
+                </div>                
+            </div>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal fade" id="addUserModal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-white">
+                    <h5 class="modal-title">Add User</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="add-user-form" class="user-form" method="POST" action="/user/addnew/save">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" class="form-control"
+                                data-parsley-required="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" name="email" class="form-control"
+                                data-parsley-required="true"
+                                data-parsley-type="email" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" name="password" id="password" class="form-control"
+                                data-parsley-required="true" />
+                        </div>
+                        <div class="form-group">
+                            <label for="conferma password">Confirm Password</label>
+                            <input type="password" name="confirm-password" class="form-control"
+                                data-parsley-required="true"
+                                data-parsley-equalto="#password"
+                                data-parsley-error-message="Password and confirm password are not equal" />
+                        </div>
+                        <div class="modal-footer">
+                            <input type="submit"  class="btn btn-warning" value="Save Changes" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{>scripts}}
+</body>
+</html>

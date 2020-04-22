@@ -1,9 +1,18 @@
 const express = require('express')
+const flash = require('connect-flash')
+const session = require('express-session')
+const bodyParser = require('body-parser')
+require('./db/mongoose')
 const path = require('path')
 const hbs = require('hbs')
+require('./utils/handlebars')
+const userRouter = require('./routers/user')
+const postRouter = require('./routers/post')
+const categoryRouter = require('./routers/category')
+const { handleErrorToRender, handleErrorToJSON, ErrorHandler } = require('./helpers/errors')
 
 const app = express()
-const port = process.env.PORT
+const port = process.env.PORT || 3000
 
 // Define paths for Express config
 const publicDirPath = path.join(__dirname, '../public')
@@ -15,22 +24,44 @@ app.set('view engine', 'hbs')
 app.set('views', viewPath)
 hbs.registerPartials(partialsPath)
 
-app.use(express.json())
-
 // Setup static directory to serve
 app.use(express.static(publicDirPath))
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json())
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true
+  }))
+app.use(flash());
+app.use(function(req, res, next){
+    res.locals.success = req.flash('success');
+    res.locals.errors = req.flash('error');
+    next();
+});
+
+app.use(userRouter)
+app.use(postRouter)
+app.use(categoryRouter)
 
 app.get('/', (req, res) => {
-    res.render('index', {
-        pageTitle: 'Blogen | Home'
-    })
+    res.redirect(301, '/login')
 })
 
 app.get('*', (req, res) => {
     res.status(404).render('404', {
-        title: '404 Page not found',
-        errorMessage: 'Page not found'
+        pageTitle: '404 Page Not Found',
+        message: 'Page Not Found!'
     })
+})
+
+app.use((err, req, res, next) => {
+    if (err.outputFormat === 'render') {
+        handleErrorToRender(err, res)
+    } else {
+        handleErrorToJSON(err, res)
+    }
 })
 
 app.listen(port, () => {

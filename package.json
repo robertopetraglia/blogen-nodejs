@@ -5,14 +5,26 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e hbs"
+    "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e js,hbs",
+    "debug": "env-cmd -f ./config/dev.env node --inspect-brk=localhost:3000 src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "connect-flash": "^0.1.1",
     "express": "^4.17.1",
-    "hbs": "^4.1.0"
+    "express-session": "^1.17.0",
+    "handlebars-dateformat": "^1.1.1",
+    "hbs": "^4.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.24.0",
+    "mongodb": "^3.5.5",
+    "mongoose": "^5.9.7",
+    "multer": "^1.4.2",
+    "validator": "^13.0.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0",
