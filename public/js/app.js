@@ -193,9 +193,7 @@ function populateRows(data, num) {
     return rowsHtml
 }
 
-function showAjaxError(jqxhr, textStatus, error) {
-    console.log(jqxhr, textStatus, error);
-    
+function showAjaxError(jqxhr, textStatus, error) {    
     let modalHTML = `<div class="modal" id="ajaxErrorModal">
                         <div class="modal-dialog">
                             <div class="modal-content">
