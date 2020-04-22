@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "env-cmd -f ./config/dev.env nodemon src/index.js -e js,hbs",
+    "start": "node src/index.js",
     "dev": "env-cmd -f ./config/dev.env nodemon src/index.js -e js,hbs",
     "debug": "env-cmd -f ./config/dev.env node --inspect-brk=localhost:3000 src/index.js"
   },
